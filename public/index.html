@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">     
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">     
+    <meta name="viewport" content="width=device-width, initial-scale=1">   
+    <link rel="stylesheet" href="index.css" media="all">  
+    <title>888</title>
+</head>
+<body>
+    <div>
+        <div class = "nav_bar">
+            <nav>
+                <a href="/" ><img class="Logo" src="image_pool/logo.png"></a>
+                <ul>
+                    <li class="nav_item"><a href="/?attribute=women">女裝</a></li>
+                    <li class="nav_space">|</li>
+                    <li class="nav_item"><a href="/?attribute=men">男裝</a></li>
+                    <li class="nav_space">|</li>
+                    <li class="nav_item"><a href="/?attribute=accessories">配件</li></a>
+                </ul>
+            </nav>
+            <div class = "nav_item_bar">
+                <!-- <form action="/?attribute=search"> -->
+                    <input id = "search" style="font-size:20px">
+                    <button  onclick="search_product()" type ="submit"></button>
+                <!-- </form> -->
+                <img src="image_pool/cart.png">
+                <a><img src="image_pool/member.png" onclick="signin_or_profile()"></a>
+
+            </div>
+        </div>
+        <div class="horizontal">
+        </div>
+        <a href="/product.html?id=3">
+            <div class="campaign_products">
+                <div class="campaign_products_story">
+
+                </div>
+            </div>
+        </a>
+        <div class="product_list" id="product_list">
+         
+        </div>
+
+        <footer>
+            <div class="footer_bar">
+                <div>
+                    <ul>
+                        <li class="nav_item">關於Stylish</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">服務條款</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">隱私政策</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">聯絡我們</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">F&Q</li>
+                    </ul>
+                </div>
+                <div class="icon">
+                    <img  src="/image_pool/line.png">
+                    <img  src="/image_pool/twitter.png">
+                    <img  src="/image_pool/facebook.png">
+                </div>
+                <div class="copyright">
+                    <p>© 2018. All rights reserved.</p>
+                </div>
+            </div>
+
+            
+
+        </footer>
+    </div>
+</body>
+
+<script>
+        
+        function search_product(){
+            let word = document.getElementById("search").value
+            console.log(document.getElementById("search").value)
+            console.log( `search?keyword=${word}`)
+            window.location.assign(`/?attribute=search?keyword=${word}`)
+        }
+        
+        
+        let web_url = document.location.href;
+        console.log(web_url);
+        let url = new URL(web_url);
+        let params = new URLSearchParams(url.search);
+        let attribute_type = params.get("attribute");
+        console.log(attribute_type)  ;
+
+        if(attribute_type == null) {
+            attribute_type = "all";
+        }
+
+
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.open("GET", `/api/v1/products/${attribute_type}`,true);
+        xhr.onreadystatechange=function() {
+            if (this.readyState == 4 && this.status == 200) {
+                let product_data = JSON.parse(xhr.responseText);
+                // console.log(product_data);
+                // console.log(product_data.data.length);
+                // console.log(product_data.data[0].id);
+                // console.log(product_data.data[0].colors);
+                // console.log(product_data.data[0].colors.length);
+                // console.log(product_data.data[0].colors[0].code);
+                for (let i = 0 ; i <product_data.data.length ; i++){
+                    //製作每一個 product 的 div
+                    let new_div_product = document.createElement("div");
+                    new_div_product.className = "product";
+                    let product_list = document.getElementById("product_list");
+                    product_list.appendChild(new_div_product);
+                    
+                    //製作每一個 product_picture 的 div
+                    let new_product_picture = document.createElement("div");
+                    new_product_picture.className = "product_picture";
+                    let product = document.getElementsByClassName("product")[i];
+                    product.appendChild(new_product_picture);
+
+                    //製作每一個 product_picture 的 連結
+                    let new_image_a = document.createElement("a");
+                    new_image_a.className = "picture_a";
+                    new_image_a.href = `/product.html?id=${product_data.data[i].id}`;
+                    let product_picture = document.getElementsByClassName("product_picture")[i];
+                    product_picture.appendChild(new_image_a);
+
+                    
+                    //製作每一個 product_picture 的 img
+                    let new_image = document.createElement("img");
+                    new_image.className = "picture";
+                    new_image.src = `${product_data.data[i].main_image}`;
+                    let picture_a = document.getElementsByClassName("picture_a")[i];
+                    picture_a.appendChild(new_image);
+
+                    //製作每一個 color_bar 的 div
+                    let new_color_bar = document.createElement("div");
+                    new_color_bar.className = "color_bar";
+                    product.appendChild(new_color_bar);            
+
+                    //迴圈製作每一個 color 的 div
+                    for(let j = 0 ; j <product_data.data[i].colors.length ; j++){
+                        //製作每一個 color 的 div
+                        let new_color = document.createElement("div");
+                        new_color.className = "color";
+                        new_color.style.backgroundColor =   "#"+`${product_data.data[i].colors[j].code}`;
+                        let color_bar = document.getElementsByClassName("color_bar")[i];
+                        color_bar.appendChild(new_color);
+                    }
+
+                    //製作每一個 product_name 的 div
+                    let new_product_name = document.createElement("div");
+                    new_product_name.className = "product_name";
+                    new_product_name.innerHTML = product_data.data[i].title;
+                    product.appendChild(new_product_name);
+
+                    //製作每一個 product_price 的 div
+                    let new_product_price = document.createElement("div");
+                    new_product_price.className = "product_price";
+                    new_product_price.innerHTML = "TWD."+product_data.data[i].price;
+                    product.appendChild(new_product_price);
+
+                }
+                    
+
+                    
+
+            }
+
+        }
+    
+        
+        xhr.send();
+    
+    
+    
+    var xhrt = new XMLHttpRequest();
+
+    xhrt.open("GET", "/api/v1/marketing/campaigns",true);
+    xhrt.onreadystatechange=function() {
+        if (this.readyState == 4 && this.status == 200) {
+            let campaign_data = JSON.parse(xhrt.responseText);
+            console.log(campaign_data);
+            console.log(campaign_data.data.length);
+            console.log(campaign_data.data[0].picture);
+            console.log(campaign_data.data[0].story);
+
+            // for (let i = 0 ; i <campaign_data.data.length; i++){
+                let campaign_products = document.getElementsByClassName("campaign_products")[0];
+                console.log(campaign_products);
+                campaign_products.style.backgroundImage =`url('${campaign_data.data[0].picture}')`;
+
+                let campaign_products_story = document.getElementsByClassName("campaign_products_story")[0];
+                console.log(campaign_products);
+                campaign_products_story.innerText = campaign_data.data[0].story;      
+                
+            // }
+
+            console.log(document.getElementsByClassName("campaign_products"));
+
+
+
+        }
+
+    }
+     
+    xhrt.send();
+
+    console.log(localStorage.getItem("access_token"));
+    console.log(localStorage.getItem("access_expired"));
+   
+    function signin_or_profile(){
+        if(localStorage.getItem("access_token") == null){
+            window.location.href="/signin.html";
+        }else if(localStorage.getItem("access_expired")-Date.now() < 0){
+            window.location.href="/signin.html";
+        }else{
+            window.location.href="/profile.html";
+        }
+    }
+
+
+</script>
+
+
+</html> 

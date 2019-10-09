@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+
+    <meta charset="UTF-8">     
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">     
+    <meta name="viewport" content="width=device-width, initial-scale=1">   
+    <link rel="stylesheet" href="thankyou.css" media="all">
+    <title>product page</title>
+
+
+
+</head>
+<body>
+    <div>
+        <div class = "nav_bar">
+            <nav>
+                <img src="image_pool/logo.png">
+                <ul>
+                    <li class="nav_item">女裝</li>
+                    <li class="nav_space">|</li>
+                    <li class="nav_item">男裝</li>
+                    <li class="nav_space">|</li>
+                    <li class="nav_item">配件</li>
+                </ul>
+            </nav>
+            <div class = "nav_item_bar">
+                <form>
+                    <input style="font-size:20px">
+                </form>
+                <img src="image_pool/cart.png">
+                <img src="image_pool/member.png">
+
+            </div>
+        </div>
+        <div class="horizontal"></div>
+        <div class= "main" >
+            <div class="thank">
+                <h1>
+                    感謝您的購買，我們會盡快將商品送達！
+                </h1>
+                <hr>
+                <h2>
+                    請記住以下訂單編號，以便查詢
+                </h2>
+                <div class="order_number">
+                    <p class="number"></p>
+                </div>
+                
+                <a href="/">繼續購物</a>
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+            
+
+
+
+        
+
+        <footer>
+            <div class="footer_bar">
+                <div>
+                    <ul>
+                        <li class="nav_item">關於Stylish</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">服務條款</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">隱私政策</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">聯絡我們</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">F&Q</li>
+                    </ul>
+                </div>
+                <div class="icon">
+                    <img  src="/image_pool/line.png">
+                    <img  src="/image_pool/twitter.png">
+                    <img  src="/image_pool/facebook.png">
+                </div>
+                <div class="copyright">
+                    <p>© 2018. All rights reserved.</p>
+                </div>
+            </div>
+
+
+        </footer>
+    </div>
+</body>
+
+<script>
+
+    let number = document.getElementsByClassName("number")[0]
+    number.innerHTML = localStorage.getItem("order_number")
+
+    console.log(number)
+    console.log(localStorage.getItem("order_number"))
+
+    localStorage.removeItem("order_number")
+
+
+
+</script>
+
+
+</html> 

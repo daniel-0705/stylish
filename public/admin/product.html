@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>product</title>
+  <script>
+  //新增全部的input功能
+  function add_input_all (obj){
+    var new_color_name_label = document.createElement("label");
+    new_color_name_label.innerHTML = "color_name:";
+    var new_color_name_input = document.createElement("input");
+    new_color_name_input.type = "text";
+    new_color_name_input.name = "color_name";
+    
+    var new_color_code_label = document.createElement("label");
+    new_color_code_label.innerHTML = "color_code:";
+    var new_color_code_input = document.createElement("input");
+    new_color_code_input.type = "text";
+    new_color_code_input.name = "color_code";
+
+    var new_size_label = document.createElement("label");
+    new_size_label.innerHTML = "size:";
+    var new_size_input = document.createElement("input");
+    new_size_input.type = "text";
+    new_size_input.name = "size";
+
+    var new_stock_label = document.createElement("label");
+    new_stock_label.innerHTML = "stock:";
+    var new_stock_input = document.createElement("input");
+    new_stock_input.type = "number";
+    new_stock_input.name = "stock";
+
+    var X = main.lastElementChild;
+
+    var change_line = document.createElement("br")
+
+    main.insertBefore(new_color_name_label,X);
+    main.insertBefore(new_color_name_input,X);
+    main.insertBefore(new_color_code_label,X);
+    main.insertBefore(new_color_code_input,X);
+    main.insertBefore(new_size_label,X);
+    main.insertBefore(new_size_input,X);
+    main.insertBefore(new_stock_label,X);
+    main.insertBefore(new_stock_input,X);
+    main.insertBefore(change_line,X);
+  }
+  </script>
+ 
+</head>
+<body>
+    <form id="main" action="/admin/product" method="POST" enctype="multipart/form-data">
+        <h1>product</h1>
+        <select name="attribute" style="width: 100px">
+          　<option value="men">男裝</option>
+          　<option value="women">女裝</option>
+          　<option value="accessories">配件</option>
+        </select>
+        <br>
+        <label>id:</label><input type="number" name="id"/>
+        <br>
+        <label>title:</label><input type="text" name="title"/>
+        <br>
+        <label>description:</label><input type="text" name="description"/>
+        <br>
+        <label>price:</label><input type="number" name="price"/>
+        <br>
+        <label>texture:</label><input type="text" name="texture"/>
+        <br>
+        <label>wash:</label><input type="text" name="wash"/>
+        <br>
+        <label>place:</label><input type="text" name="place"/>
+        <br>
+        <label>note:</label><input type="text" name="note"/>
+        <br>
+        <label>story:</label><input type="text" name="story"/>
+        <br>
+        <label>main_image:</label><input type="file" name="main_image"/>
+        <br>
+        <label>images:</label><input type="file" name="images" multiple/>
+        <br>
+        
+
+        
+
+        <h1>variants</h1> 
+        <input type="button" value="增加項目" onclick=add_input_all()><br />
+        <label>color_name:</label><input type="text" name="color_name" placeholder="白色">
+        <label>color_code:</label><input type="text" name="color_code" placeholder="FFFFFF">
+        
+        <label>size:</label><input type="text" name="size">
+        
+        <label>stock:</label><input type="number" name="stock">
+        <br>
+
+        
+
+        <input type="submit" value="提交"/>
+        
+    </form>
+  
+</body>
+
+</html>

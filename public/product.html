@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+
+    <meta charset="UTF-8">     
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">     
+    <meta name="viewport" content="width=device-width, initial-scale=1">   
+    <link rel="stylesheet" href="product.css" media="all">
+    <title>product page</title>
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"> -->
+    <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://js.tappaysdk.com/tpdirect/v5.1.0"></script>
+    <script>
+        TPDirect.setupSDK(12348, 'app_pa1pQcKoY22IlnSXq5m5WP5jFKzoRG58VEXpT7wU62ud7mMbDOGzCYIlzzLF', 'sandbox');
+    </script>
+    <style>
+        #tappay-iframe {
+            font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+            margin: 0;
+            outline: 0;
+            -webkit-appearance: none;
+            tap-highlight-color: rgba(255,255,255,0);
+            line-height: 1.21428571em;
+            padding: .578571em 1em;
+            font-size: 1em;
+            background: #fff;
+            border: 1px solid rgba(34,36,38,.15);
+            color: rgba(0,0,0,.87);
+            border-radius: .28571429rem;
+            box-shadow: 0 0 0 0 transparent inset;
+            -webkit-transition: color .1s ease,border-color .1s ease;
+            transition: color .1s ease,border-color .1s ease;
+            width: 100%;
+        }
+    </style>
+
+
+</head>
+<body>
+    <div>
+        <div class = "nav_bar">
+            <nav>
+                <a href="/" ><img class="Logo" src="image_pool/logo.png"></a>
+                <ul>
+                    <li class="nav_item"><a href="/?attribute=women">女裝</a></li>
+                    <li class="nav_space">|</li>
+                    <li class="nav_item"><a href="/?attribute=men">男裝</a></li>
+                    <li class="nav_space">|</li>
+                    <li class="nav_item"><a href="/?attribute=accessories">配件</li></a>
+                </ul>
+            </nav>
+            <div class = "nav_item_bar">
+                <!-- <form action="/?attribute=search"> -->
+                    <input id = "search" style="font-size:20px">
+                    <button class="search" onclick="search_product()" type ="submit"></button>
+                <!-- </form> -->
+                <img src="image_pool/cart.png">
+                <a><img src="image_pool/member.png" onclick="signin_or_profile()"></a>
+    
+            </div>
+        </div>
+        <div class="horizontal"></div>
+        
+        <div class= "main">
+            <div class= "picture_and_detail" >  
+                <div class= "product_picture">
+                    
+                </div>
+
+                <div class= "detail_and_card">
+                    <div class="product_detail">
+                        
+                    </div>
+      
+                    
+                    
+                    <!-- TapPay -->
+  
+                    <div class="tappay"></div>
+                        <form class="ui form">
+                            <div class="field">
+                                <div id="card">信用卡</div>
+                                <div id="tappay-iframe"></div>
+                            </div>
+                            <div class="ui button" id="submit" >Get It !</div>
+                        </form>
+                        
+                        
+                        
+                        <!-- <pre class="ui error message" id="message" style="overflow-x: auto">
+                        </pre>
+                        <pre class="ui info message" id="result" style="overflow-x: auto">
+                        </pre>
+                        <pre class="ui info message" id="curl" style="overflow-x: auto">
+                        </pre> -->
+                    </div>  
+              
+                    
+
+
+                </div>
+
+
+            
+    
+
+
+            
+                <div class="separator">
+                    更多產品資訊-------------------------------------------------------------------------------------------------------------------
+
+                </div>
+
+                <div class="product_story">
+        
+                </div>
+
+                <div class = "product_images">
+
+                </div>
+
+
+
+
+
+
+
+            
+
+
+            
+        </div>
+
+        <footer>
+            <div class="footer_bar">
+                <div>
+                    <ul>
+                        <li class="nav_item">關於Stylish</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">服務條款</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">隱私政策</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">聯絡我們</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">F&Q</li>
+                    </ul>
+                </div>
+                <div class="icon">
+                    <img  src="/image_pool/line.png">
+                    <img  src="/image_pool/twitter.png">
+                    <img  src="/image_pool/facebook.png">
+                </div>
+                <div class="copyright">
+                    <p>© 2018. All rights reserved.</p>
+                </div>
+            </div>
+
+
+        </footer>
+    </div>
+</body>
+
+<script>
+    
+    function signin_or_profile(){
+        if(localStorage.getItem("access_token") == null){
+            window.location.href="/signin.html";
+        }else if(localStorage.getItem("access_expired")-Date.now() < 0){
+            window.location.href="/signin.html";
+        }else{
+            window.location.href="/profile.html";
+        }
+    }
+
+    function search_product(){
+        let word = document.getElementById("search").value;
+        console.log(document.getElementById("search").value);
+        console.log( `search?keyword=${word}`);
+        window.location.assign(`/?attribute=search?keyword=${word}`);
+    }
+
+
+    let web_url = document.location.href;
+    console.log(web_url);
+    let url = new URL(web_url);
+    let params = new URLSearchParams(url.search);
+    let id_number = params.get("id");
+    console.log(id_number);
+
+    var xhr = new XMLHttpRequest();
+
+    xhr.open("GET", `/api/v1/products/details?id=${id_number}`,true);
+    xhr.onreadystatechange=function() {
+        if (this.readyState == 4 && this.status == 200) {
+            let product_data = JSON.parse(xhr.responseText);
+            console.log(product_data);
+            // console.log(product_data.data.length);
+            // console.log(product_data.data[0].id);
+            // console.log(product_data.data[0].colors);
+            // console.log(product_data.data[0].colors.length);
+            // console.log(product_data.data[0].colors[0].code);
+
+            //製作 product_main_image 的 img
+            let new_main_image = document.createElement("img");
+            new_main_image.className = "product_main_image";
+            new_main_image.src = `${product_data.data[0].main_image}`;
+            let product_picture = document.getElementsByClassName("product_picture")[0];
+            product_picture.appendChild(new_main_image);
+
+            //製作 product_name 的 div
+            let new_product_name = document.createElement("div");
+            new_product_name.className = "product_name";
+            new_product_name.innerHTML = product_data.data[0].title;
+            let product_detail = document.getElementsByClassName("product_detail")[0];
+            product_detail.appendChild(new_product_name);
+
+            //製作 product_id 的 div
+            let new_product_id = document.createElement("div");
+            new_product_id.className = "product_id";
+            new_product_id.innerHTML = product_data.data[0].id;
+            product_detail.appendChild(new_product_id);
+                
+            //製作 product_price 的 div
+            let new_product_price = document.createElement("div");
+            new_product_price.className = "product_price";
+            new_product_price.innerHTML = "TWD."+product_data.data[0].price;
+            product_detail.appendChild(new_product_price);
+
+            //製作 hr
+            let new_hr = document.createElement("div");
+            new_hr.className = "hr";
+            new_hr.innerHTML = "<hr>";
+            product_detail.appendChild(new_hr);
+
+            //製作 product_color 的 div
+            let new_product_color = document.createElement("div");
+            new_product_color.className = "product_color";
+            product_detail.appendChild(new_product_color);
+
+            //製作 title 的 div
+            let new_color_title = document.createElement("div");
+            new_color_title.className = "color_title";
+            new_color_title.innerHTML = "顏色|";
+            let product_color = document.getElementsByClassName("product_color")[0];
+            product_color.appendChild(new_color_title);
+
+            for(let i = 0; i<product_data.data[0].colors.length;i++){  
+                
+                //製作每一個 color 的 div
+                let new_color = document.createElement("div");
+                new_color.className = "color";
+                new_color.style.backgroundColor =   "#"+`${product_data.data[0].colors[i].code}`;
+                product_color.appendChild(new_color);
+
+            }
+
+            //製作 product_size 的 div
+            let new_product_size = document.createElement("div");
+            new_product_size.className = "product_size";
+            product_detail.appendChild(new_product_size);
+
+            //製作 title 的 div
+            let new_size_title = document.createElement("div");
+            new_size_title.className = "size_title";
+            new_size_title.innerHTML = "尺寸|";
+            let product_size = document.getElementsByClassName("product_size")[0];
+            product_size.appendChild(new_size_title);
+
+            for(let i = 0; i<product_data.data[0].sizes.length;i++){  
+                
+                //製作每一個 size 的 div
+                let new_size = document.createElement("div");
+                new_size.className = "size";
+                new_size.innerHTML =  product_data.data[0].sizes[i];
+                product_size.appendChild(new_size);
+
+            }
+
+            //製作 product_qty 的 div
+            let new_product_qty = document.createElement("div");
+            new_product_qty.className = "product_qty";
+            product_detail.appendChild(new_product_qty);
+
+            //製作 title 的 div
+            let new_qty_title = document.createElement("div");
+            new_qty_title.className = "qty_title";
+            new_qty_title.innerHTML = "數量|";
+            let product_qty = document.getElementsByClassName("product_qty")[0];
+            product_qty.appendChild(new_qty_title);
+
+            //製作 qty_bar 的 div
+            let new_qty_bar = document.createElement("div");
+            new_qty_bar.className = "qty_bar";
+            product_qty.appendChild(new_qty_bar);
+
+            //製作 minus 的 div
+            let new_minus = document.createElement("div");
+            new_minus.className = "minus";
+            new_minus.innerHTML = "-";
+            let qty_bar = document.getElementsByClassName("qty_bar")[0];
+            qty_bar.appendChild(new_minus);
+
+            //製作 qty 的 div
+            let new_qty = document.createElement("div");
+            new_qty.className = "qty";
+            new_qty.innerHTML = "1";
+            qty_bar.appendChild(new_qty);
+
+            //製作 plus 的 div
+            let new_plus = document.createElement("div");
+            new_plus.className = "plus";
+            new_plus.innerHTML = "+";
+            qty_bar.appendChild(new_plus);
+
+
+            //製作 product_note 的 div
+            let new_product_note = document.createElement("div");
+            new_product_note.className = "product_note";
+            new_product_note.innerHTML = "*"+product_data.data[0].note;
+            product_detail.appendChild(new_product_note);
+
+
+            //製作 product_story 的 內容
+            let product_story = document.getElementsByClassName("product_story")[0];
+            product_story.innerHTML = product_data.data[0].story;
+
+            for(let k = 0; k<product_data.data[0].images.length;k++){  
+                
+                //製作每一個 images 的 img
+                let new_images = document.createElement("img");
+                new_images.className = "images";
+                new_images.src = `${product_data.data[0].images[k]}`;
+
+                console.log(new_images);
+
+                let product_images = document.getElementsByClassName("product_images")[0];
+                product_images.appendChild(new_images);
+
+            }
+            // tappay 部分
+            var statusTable = {
+            '0': '欄位已填好，並且沒有問題',
+            '1': '欄位還沒有填寫',
+            '2': '欄位有錯誤，此時在 CardView 裡面會用顯示 errorColor',
+            '3': '使用者正在輸入中',
+            };
+            var defaultCardViewStyle = {
+                color: 'rgb(0,0,0)',
+                fontSize: '15px',
+                lineHeight: '24px',
+                fontWeight: '300',
+                errorColor: 'red',
+                placeholderColor: ''
+            };
+            TPDirect.card.setup('#tappay-iframe', defaultCardViewStyle,  { isUsedCcv: true  });
+            TPDirect.card.onUpdate(function (update) {
+                var submitButton = document.querySelector('#submit');
+                var cardViewContainer = document.querySelector('#tappay-iframe');
+                if (update.canGetPrime) {
+                    submitButton.removeAttribute('disabled');
+                } else {
+                    submitButton.setAttribute('disabled', true);
+                }
+                // var message = document.querySelector('#message');
+                // message.innerHTML = `
+                //     canGetPrime: ${update.canGetPrime} \n
+                //     cardNumberStatus: ${statusTable[update.status.number]} \n
+                //     cardExpiryStatus: ${statusTable[update.status.expiry]} \n
+                //     cvcStatus: ${statusTable[update.status.cvc]}
+                // `.replace(/    /g, '');
+                // if (update.hasError) {
+                //     message.classList.add('error');
+                //     message.classList.remove('info');
+                // } else {
+                //     message.classList.remove('error');
+                //     message.classList.add('info');
+                // }
+            });
+            document.querySelector('#submit').addEventListener('click', function(event) {
+                TPDirect.card.getPrime(function(result) {
+                    // document.querySelector('#result').innerHTML  = JSON.stringify(result, null, 4)
+                    console.log(result);
+                    console.log(result.status);
+
+                    if(result.status !==0){
+                        alert("信用卡內容有誤");
+                    }else{
+                        var user_order_thing = {
+                            prime: result.card.prime,
+                            order: {
+                                shipping: "delivery",
+                                payment: "credit_card",
+                                subtotal: product_data.data[0].price,
+                                freight: Math.round(product_data.data[0].price / 10),
+                                total : product_data.data[0].price+ Math.round(product_data.data[0].price / 10),
+                                recipient: {
+                                name: "王小明",
+                                phone : "+886923456789",
+                                email: "LittleMing@Wang.com",
+                                address: "台北市天龍區芝麻街1號1樓",
+                                time: "morining"
+                                }
+                            ,
+                            list : [{
+                                id :product_data.data[0].id,
+                                name :product_data.data[0].title,
+                                price: product_data.data[0].price,
+                                color:{
+                                    code:product_data.data[0].colors[0].code,
+                                    name:product_data.data[0].colors[0].name
+                                },
+                                size : product_data.data[0].sizes[0],
+                                qty : 1
+                            }]
+                            }
+                        };
+                        // document.querySelector('#curl').innerHTML = command;
+
+                        console.log(JSON.stringify(user_order_thing.order.list.length));
+                        console.log(JSON.stringify(user_order_thing));
+
+
+                        
+                        let xhrt = new XMLHttpRequest();
+                        //使用HTTP POST请求与服务器交互数据
+                        xhrt.open("POST", "/order/checkout");
+                        //设置发送数据的请求格式
+                        xhrt.setRequestHeader('Content-Type', 'application/json');
+                        
+                        xhrt.send(JSON.stringify(user_order_thing));
+                        //this.location.assign("/");
+
+                        xhrt.onreadystatechange=function() {
+                            if (this.readyState == 4 && this.status == 200) {
+                            console.log(xhrt.response);
+                            if(xhrt.response == "error"){
+                                alert("付款失敗");
+                            }else{
+                                let order_number = JSON.parse(xhrt.response);
+                                console.log(order_number);
+                                localStorage.setItem("order_number",order_number.data.number);
+                                window.location.href="/thankyou.html";
+                            }
+
+                            }
+                        }
+                    }
+
+                });
+            });
+
+
+
+
+
+        }
+
+    }
+     
+    xhr.send();
+
+
+</script>
+
+
+
+</html> 

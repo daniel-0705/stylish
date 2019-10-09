@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">     
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">     
+    <meta name="viewport" content="width=device-width, initial-scale=1">   
+    <link rel="stylesheet" href="signin.css" media="all">  
+    <title>Sign Up</title>
+
+   
+</head>
+<body>
+    <div>
+        <div class = "nav_bar">
+            <nav>
+                <a href="/" ><img class="Logo" src="image_pool/logo.png"></a>
+                <ul>
+                    <li class="nav_item"><a href="/?attribute=women">女裝</a></li>
+                    <li class="nav_space">|</li>
+                    <li class="nav_item"><a href="/?attribute=men">男裝</a></li>
+                    <li class="nav_space">|</li>
+                    <li class="nav_item"><a href="/?attribute=accessories">配件</li></a>
+                </ul>
+            </nav>
+            <div class = "nav_item_bar">
+                <!-- <form action="/?attribute=search"> -->
+                    <input id = "search" style="font-size:20px">
+                    <button  class="search" onclick="search_product()" type ="submit"></button>
+                <!-- </form> -->
+                <img src="image_pool/cart.png">
+                <a><img src="image_pool/member.png" onclick="signin_or_profile()"></a>
+    
+            </div>
+        </div>
+        <div class="horizontal">
+        </div> 
+
+        <div class="container">
+            <div class="picture_container">
+                <img class="picture" src="signin_signup.jpg"> 
+            </div>
+            <div class="sign_in_container">
+                <img class ="logo" src="image_pool/logo_transparent.png">
+                <h1>Account Log In</h1>
+                <div class="text">
+                    <input class="user"  id = "name" type="text" placeholder="name">
+                    <input class="user"  id = "email" type="text" placeholder="email">
+                    <input class="user"  id = "password" type="password" placeholder="password">
+                    <button  onclick="set_header()" >Sign up</button>
+                
+                </div>
+                
+            </div>
+
+        </div>
+
+
+
+
+
+        <footer>
+            <div class="footer_bar">
+                <div>
+                    <ul>
+                        <li class="nav_item">關於Stylish</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">服務條款</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">隱私政策</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">聯絡我們</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">F&Q</li>
+                    </ul>
+                </div>
+                <div class="icon">
+                    <img  src="/image_pool/line.png">
+                    <img  src="/image_pool/twitter.png">
+                    <img  src="/image_pool/facebook.png">
+                </div>
+                <div class="copyright">
+                    <p>© 2018. All rights reserved.</p>
+                </div>
+            </div>
+
+            
+
+        </footer>
+    </div>
+</body>
+
+<script>
+    function signin_or_profile(){
+        if(localStorage.getItem("access_token") == null){
+            window.location.href="/signin.html";
+        }else if(localStorage.getItem("access_expired")-Date.now() < 0){
+            window.location.href="/signin.html";
+        }else{
+            window.location.href="/profile.html";
+        }
+    }
+    function search_product(){
+        let word = document.getElementById("search").value;
+        console.log(document.getElementById("search").value);
+        console.log( `search?keyword=${word}`);
+        window.location.assign(`/?attribute=search?keyword=${word}`);
+    }
+
+
+
+
+    function set_header() {
+    
+    
+        console.log(document.getElementById("email").value);
+
+        if(document.getElementById("name").value == ""){
+            alert("! Enter Your Email");
+        }else if(document.getElementById("email").value == ""){
+            alert("! Enter Your Email");
+        }else if(document.getElementById("password").value == '' ){
+            alert("! Enter Your Password");
+        }else{
+            var xhr = new XMLHttpRequest();
+            //使用HTTP POST请求与服务器交互数据
+            xhr.open("POST", "/user/signup");
+            //设置发送数据的请求格式
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            
+            xhr.send(JSON.stringify({
+                "name": document.getElementById("name").value,
+                "email": document.getElementById("email").value, 
+                "password": document.getElementById("password").value
+            })
+            );
+
+            xhr.onreadystatechange=function() {
+                if (this.readyState == 4 && this.status == 200) {
+                console.log(xhr.response);
+                    
+                let user_number = JSON.parse(xhr.response);
+                console.log(user_number);
+                localStorage.setItem("access_token",user_number.data.access_token);
+                localStorage.setItem("access_expired",user_number.data.access_expired);
+                window.location.href="/";
+                    
+                    
+                }
+            }
+        }
+        
+
+
+
+
+    }
+
+</script>
+
+
+</html> 

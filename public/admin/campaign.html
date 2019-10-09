@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>campaign</title>
+  <script>
+  //新增全部的input功能
+  function add_input_all (obj){
+    var new_product_id_label = document.createElement("label");
+    new_product_id_label.innerHTML = "product_id:";
+    var new_product_id_input = document.createElement("input");
+    new_product_id_input.type = "text";
+    new_product_id_input.name = "product_id";
+    
+    var new_picture_label = document.createElement("label");
+    new_picture_label.innerHTML = "picture:";
+    var new_picture_input = document.createElement("input");
+    new_picture_input.type = "file";
+    new_picture_input.name = "picture";
+
+    var new_story_label = document.createElement("label");
+    new_story_label.innerHTML = "story:";
+    var new_story_input = document.createElement("textarea");
+    new_story_input.name = "story";
+
+    var X = main.lastElementChild;
+
+    var change_line = document.createElement("br")
+
+    main.insertBefore(new_product_id_label,X);
+    main.insertBefore(new_product_id_input,X);
+    main.insertBefore(new_picture_label,X);
+    main.insertBefore(new_picture_input,X);
+    main.insertBefore(new_story_label,X);
+    main.insertBefore(new_story_input,X);
+    main.insertBefore(change_line,X);
+  }
+  </script>
+ 
+</head>
+<body>
+    <form id="main" action="/admin/campaign" method="POST" enctype="multipart/form-data">
+
+        <h1>campaign</h1> 
+        <input type="button" value="增加項目" onclick=add_input_all()><br />
+        <label>product_id:</label><input type="text" name="product_id" >
+        <label>picture:</label><input type="file" name="picture" >
+        <label>story:</label><textarea  name="story"></textarea>>
+        
+        <br>
+
+        
+
+        <input type="submit" value="提交"/>
+        
+    </form>
+  
+</body>
+
+</html>

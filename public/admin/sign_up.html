@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>sign up</title>
+</head>
+<body>
+    
+        <h1>User Sign Up</h1>
+        <label>name:</label><input type="text" id="name" name="name"/>
+        <br>
+        <br>
+        <label>email:</label><input type="text" id="email" name="email"/>
+        <br>
+        <br>
+        <label>password:</label><input type="password" id="password" name="password"/>
+        <br>
+        <br>
+
+        <button type ="submit"  onclick="set_header()">註冊</button>
+
+        
+    <script>
+        
+        function set_header() {
+            var xhr = new XMLHttpRequest();
+        //使用HTTP POST请求与服务器交互数据
+        xhr.open("POST", "/user/signup");
+        //设置发送数据的请求格式
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        xhr.send(JSON.stringify({ "name": document.getElementById("name").value,"email": document.getElementById("email").value, "password": document.getElementById("password").value}))
+        //this.location.assign("/")
+        }
+
+    </script>
+
+
+</body>
+</html> 

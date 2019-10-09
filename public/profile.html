@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+
+    <meta charset="UTF-8">     
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">     
+    <meta name="viewport" content="width=device-width, initial-scale=1">   
+    <link rel="stylesheet" href="profile.css" media="all">
+    <title>User Profile</title>
+
+</head>
+<body>
+    <div>
+        <div class = "nav_bar">
+            <nav>
+                <a href="/" ><img class="Logo" src="image_pool/logo.png"></a>
+                <ul>
+                    <li class="nav_item"><a href="/?attribute=women">女裝</a></li>
+                    <li class="nav_space">|</li>
+                    <li class="nav_item"><a href="/?attribute=men">男裝</a></li>
+                    <li class="nav_space">|</li>
+                    <li class="nav_item"><a href="/?attribute=accessories">配件</li></a>
+                </ul>
+            </nav>
+            <div class = "nav_item_bar">
+                <!-- <form action="/?attribute=search"> -->
+                    <input id = "search" style="font-size:20px">
+                    <button class="search" onclick="search_product()" type ="submit"></button>
+                <!-- </form> -->
+                <img src="image_pool/cart.png">
+                <a><img src="image_pool/member.png" onclick="signin_or_profile()"></a>
+    
+            </div>
+        </div>
+        <div class="horizontal"></div>
+
+        <div class="container">
+            <div class="picture_container">
+                <img class="picture" id ="picture"> 
+            </div>
+            <div class="sign_in_container">
+                <img class ="logo" src="image_pool/logo_transparent.png">
+                <h1>User Profile</h1>
+                <div class="text">
+                    <div class="user"  id = "id" ></div>
+                    <div class="user"  id = "name" ></div>
+                    <div class="user"  id = "email"></div>
+                
+                </div>
+                
+            </div>
+
+        </div>
+        
+
+
+    </div>
+
+        <footer>
+            <div class="footer_bar">
+                <div>
+                    <ul>
+                        <li class="nav_item">關於Stylish</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">服務條款</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">隱私政策</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">聯絡我們</li>
+                        <li class="nav_space">|</li>
+                        <li class="nav_item">F&Q</li>
+                    </ul>
+                </div>
+                <div class="icon">
+                    <img  src="/image_pool/line.png">
+                    <img  src="/image_pool/twitter.png">
+                    <img  src="/image_pool/facebook.png">
+                </div>
+                <div class="copyright">
+                    <p>© 2018. All rights reserved.</p>
+                </div>
+            </div>
+
+
+        </footer>
+    </div>
+</body>
+<script>
+    
+    function search_product(){
+        let word = document.getElementById("search").value;
+        console.log(document.getElementById("search").value);
+        console.log( `search?keyword=${word}`);
+        window.location.assign(`/?attribute=search?keyword=${word}`);
+    }
+
+
+
+    function signin_or_profile(){
+        if(localStorage.getItem("access_token") == null){
+            window.location.href="/signin.html";
+        }else if(localStorage.getItem("access_expired")-Date.now() < 0){
+            window.location.href="/signin.html";
+        }else{
+            window.location.href="/profile.html";
+        }
+    }
+    
+    
+    
+    
+    if(localStorage.getItem("access_token")-Date.now()<0){
+        window.location.href="/signin.html";
+    }else{
+        var xhr = new XMLHttpRequest();
+        //使用HTTP POST请求与服务器交互数据
+        xhr.open("GET", "/user/profile");
+        //设置发送数据的请求格式
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('authorization', 'Bearer '+localStorage.getItem("access_token"));
+        console.log(localStorage.getItem("access_token"));
+        
+        xhr.send(localStorage.getItem("access_token"));
+
+        xhr.onreadystatechange=function() {
+            if (this.readyState == 4 && this.status == 200) {
+            console.log(xhr.response);
+                if(xhr.response == "error"){
+                    alert("查無此使用者，請註冊");
+                }else{
+                    let user_number = JSON.parse(xhr.response);
+                    console.log(user_number);
+                    // localStorage.setItem("access_token",user_number.data.access_token);
+                    // localStorage.setItem("access_expired",user_number.data.access_expired);
+                    // window.location.href="/";
+                    
+                    //製作id 的 div
+                    let new_id = document.getElementById("id");
+                    new_id.innerHTML = user_number.data.id;
+
+                    //製作name 的 div
+                    let new_name = document.getElementById("name");
+                    new_name.innerHTML = user_number.data.name;
+
+                    //製作email 的 div
+                    let new_email = document.getElementById("email");
+                    new_email.innerHTML = user_number.data.email;
+
+                    let new_image = document.getElementById("picture");
+                    new_image.src = user_number.data.picture;
+
+                }
+                
+            }
+        }
+    }
+    
+    
+    
+
+
+
+</script>
+
+
+
+
+</html> 
