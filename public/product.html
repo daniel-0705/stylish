@@ -8,8 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">   
     <link rel="stylesheet" href="product.css" media="all">
     <title>product page</title>
-
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"> -->
     <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="https://js.tappaysdk.com/tpdirect/v5.1.0"></script>
     <script>
@@ -52,10 +50,9 @@
                 </ul>
             </nav>
             <div class = "nav_item_bar">
-                <!-- <form action="/?attribute=search"> -->
-                    <input id = "search" style="font-size:20px">
-                    <button class="search" onclick="search_product()" type ="submit"></button>
-                <!-- </form> -->
+            
+                <input id = "search" style="font-size:20px">
+                <button class="search" onclick="search_product()" type ="submit"></button>
                 <img src="image_pool/cart.png">
                 <a><img src="image_pool/member.png" onclick="signin_or_profile()"></a>
     
@@ -78,58 +75,35 @@
                     
                     <!-- TapPay -->
   
-                    <div class="tappay"></div>
-                        <form class="ui form">
-                            <div class="field">
-                                <div id="card">信用卡</div>
-                                <div id="tappay-iframe"></div>
-                            </div>
-                            <div class="ui button" id="submit" >Get It !</div>
-                        </form>
-                        
-                        
-                        
-                        <!-- <pre class="ui error message" id="message" style="overflow-x: auto">
-                        </pre>
-                        <pre class="ui info message" id="result" style="overflow-x: auto">
-                        </pre>
-                        <pre class="ui info message" id="curl" style="overflow-x: auto">
-                        </pre> -->
-                    </div>  
+                    <div class="tappay">
+                    </div>
+                    <form class="ui form">
+                        <div class="field">
+                            <div id="card">信用卡</div>
+                            <div id="tappay-iframe"></div>
+                        </div>
+                        <div class="ui button" id="submit" >Get It !</div>
+                    </form>
+
+                </div>  
               
                     
 
 
-                </div>
+            </div>
 
+            <div class="separator">
+                更多產品資訊-------------------------------------------------------------------------------------------------------------------
 
-            
+            </div>
+
+            <div class="product_story">
     
+            </div>
 
+            <div class = "product_images">
 
-            
-                <div class="separator">
-                    更多產品資訊-------------------------------------------------------------------------------------------------------------------
-
-                </div>
-
-                <div class="product_story">
-        
-                </div>
-
-                <div class = "product_images">
-
-                </div>
-
-
-
-
-
-
-
-            
-
-
+            </div>
             
         </div>
 
@@ -177,18 +151,14 @@
 
     function search_product(){
         let word = document.getElementById("search").value;
-        console.log(document.getElementById("search").value);
-        console.log( `search?keyword=${word}`);
         window.location.assign(`/?attribute=search?keyword=${word}`);
     }
 
 
     let web_url = document.location.href;
-    console.log(web_url);
     let url = new URL(web_url);
     let params = new URLSearchParams(url.search);
     let id_number = params.get("id");
-    console.log(id_number);
 
     var xhr = new XMLHttpRequest();
 
@@ -196,12 +166,6 @@
     xhr.onreadystatechange=function() {
         if (this.readyState == 4 && this.status == 200) {
             let product_data = JSON.parse(xhr.responseText);
-            console.log(product_data);
-            // console.log(product_data.data.length);
-            // console.log(product_data.data[0].id);
-            // console.log(product_data.data[0].colors);
-            // console.log(product_data.data[0].colors.length);
-            // console.log(product_data.data[0].colors[0].code);
 
             //製作 product_main_image 的 img
             let new_main_image = document.createElement("img");
@@ -334,8 +298,6 @@
                 new_images.className = "images";
                 new_images.src = `${product_data.data[0].images[k]}`;
 
-                console.log(new_images);
-
                 let product_images = document.getElementsByClassName("product_images")[0];
                 product_images.appendChild(new_images);
 
@@ -364,26 +326,9 @@
                 } else {
                     submitButton.setAttribute('disabled', true);
                 }
-                // var message = document.querySelector('#message');
-                // message.innerHTML = `
-                //     canGetPrime: ${update.canGetPrime} \n
-                //     cardNumberStatus: ${statusTable[update.status.number]} \n
-                //     cardExpiryStatus: ${statusTable[update.status.expiry]} \n
-                //     cvcStatus: ${statusTable[update.status.cvc]}
-                // `.replace(/    /g, '');
-                // if (update.hasError) {
-                //     message.classList.add('error');
-                //     message.classList.remove('info');
-                // } else {
-                //     message.classList.remove('error');
-                //     message.classList.add('info');
-                // }
             });
             document.querySelector('#submit').addEventListener('click', function(event) {
                 TPDirect.card.getPrime(function(result) {
-                    // document.querySelector('#result').innerHTML  = JSON.stringify(result, null, 4)
-                    console.log(result);
-                    console.log(result.status);
 
                     if(result.status !==0){
                         alert("信用卡內容有誤");
@@ -417,33 +362,22 @@
                             }]
                             }
                         };
-                        // document.querySelector('#curl').innerHTML = command;
 
-                        console.log(JSON.stringify(user_order_thing.order.list.length));
-                        console.log(JSON.stringify(user_order_thing));
-
-
-                        
                         let xhrt = new XMLHttpRequest();
-                        //使用HTTP POST请求与服务器交互数据
                         xhrt.open("POST", "/order/checkout");
-                        //设置发送数据的请求格式
                         xhrt.setRequestHeader('Content-Type', 'application/json');
                         
                         xhrt.send(JSON.stringify(user_order_thing));
-                        //this.location.assign("/");
 
                         xhrt.onreadystatechange=function() {
                             if (this.readyState == 4 && this.status == 200) {
-                            console.log(xhrt.response);
-                            if(xhrt.response == "error"){
-                                alert("付款失敗");
-                            }else{
-                                let order_number = JSON.parse(xhrt.response);
-                                console.log(order_number);
-                                localStorage.setItem("order_number",order_number.data.number);
-                                window.location.href="/thankyou.html";
-                            }
+                                if(xhrt.response == "error"){
+                                    alert("付款失敗");
+                                }else{
+                                    let order_number = JSON.parse(xhrt.response);
+                                    localStorage.setItem("order_number",order_number.data.number);
+                                    window.location.href="/thankyou.html";
+                                }
 
                             }
                         }
@@ -452,12 +386,7 @@
                 });
             });
 
-
-
-
-
         }
-
     }
      
     xhr.send();

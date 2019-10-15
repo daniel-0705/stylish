@@ -24,10 +24,9 @@
                 </ul>
             </nav>
             <div class = "nav_item_bar">
-                <!-- <form action="/?attribute=search"> -->
-                    <input id = "search" style="font-size:20px">
-                    <button class="search" onclick="search_product()" type ="submit"></button>
-                <!-- </form> -->
+                
+                <input id = "search" style="font-size:20px">
+                <button class="search" onclick="search_product()" type ="submit"></button>
                 <img src="image_pool/cart.png">
                 <a><img src="image_pool/member.png" onclick="signin_or_profile()"></a>
     
@@ -90,8 +89,6 @@
     
     function search_product(){
         let word = document.getElementById("search").value;
-        console.log(document.getElementById("search").value);
-        console.log( `search?keyword=${word}`);
         window.location.assign(`/?attribute=search?keyword=${word}`);
     }
 
@@ -114,26 +111,18 @@
         window.location.href="/signin.html";
     }else{
         var xhr = new XMLHttpRequest();
-        //使用HTTP POST请求与服务器交互数据
         xhr.open("GET", "/user/profile");
-        //设置发送数据的请求格式
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('authorization', 'Bearer '+localStorage.getItem("access_token"));
-        console.log(localStorage.getItem("access_token"));
         
         xhr.send(localStorage.getItem("access_token"));
 
         xhr.onreadystatechange=function() {
             if (this.readyState == 4 && this.status == 200) {
-            console.log(xhr.response);
                 if(xhr.response == "error"){
                     alert("查無此使用者，請註冊");
                 }else{
                     let user_number = JSON.parse(xhr.response);
-                    console.log(user_number);
-                    // localStorage.setItem("access_token",user_number.data.access_token);
-                    // localStorage.setItem("access_expired",user_number.data.access_expired);
-                    // window.location.href="/";
                     
                     //製作id 的 div
                     let new_id = document.getElementById("id");

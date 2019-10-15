@@ -61,18 +61,6 @@ var pool = mysql.createPool({
 
 
 
-
-//just test outcome
-app.get("/",function(req,res){
-
-    res.send("submmit ok")  
-});
-
-app.post("/test", admin.fields([{name:'main_image',maxCount:6},{name:'images',maxCount:12}]),function(req,res){
-
-})
-
-
 //user input the product data from product.html and send here
 app.post("/admin/product", admin.fields([{name:'main_image',maxCount:1},{name:'images',maxCount:2}]),function(req,res){
 
@@ -81,7 +69,7 @@ app.post("/admin/product", admin.fields([{name:'main_image',maxCount:1},{name:'i
             if (err) {
                 console.log(`insert ${table_name} table fail`);
             }else{
-            console.log(`insert ${table_name} table ok`);
+                console.log(`insert ${table_name} table ok`);
             }
         });
     };
@@ -101,7 +89,6 @@ app.post("/admin/product", admin.fields([{name:'main_image',maxCount:1},{name:'i
         main_image:req.files['main_image'][0].location,
         attribute:req.body.attribute
     };
-    // console.log(product_object)
     mySQL_insert("products",product_object);
 
     //input insert to database test table color 
@@ -111,7 +98,6 @@ app.post("/admin/product", admin.fields([{name:'main_image',maxCount:1},{name:'i
             code : req.body.color_code,
             name : req.body.color_name
         };
-        // console.log(colors_object)
         mySQL_insert("color",colors_object);
 
     }else{
@@ -121,7 +107,6 @@ app.post("/admin/product", admin.fields([{name:'main_image',maxCount:1},{name:'i
                 code : req.body.color_code[i],
                 name : req.body.color_name[i]
             };
-            // console.log(colors_object)
             mySQL_insert("color",colors_object);
         } 
     }
@@ -134,7 +119,6 @@ app.post("/admin/product", admin.fields([{name:'main_image',maxCount:1},{name:'i
             size : req.body.size,
             stock:parseInt(req.body.stock)
         };
-        // console.log(variant_object);
         mySQL_insert("variant",variant_object);
     }else{
         for (var i = 0 ;i <req.body.color_code.length ;i++){ 
@@ -144,7 +128,6 @@ app.post("/admin/product", admin.fields([{name:'main_image',maxCount:1},{name:'i
                 size : req.body.size[i],
                 stock:parseInt(req.body.stock[i])
             };
-            // console.log(variant_object)
             mySQL_insert("variant",variant_object);
         };    
     };
@@ -155,7 +138,6 @@ app.post("/admin/product", admin.fields([{name:'main_image',maxCount:1},{name:'i
             id:parseInt(req.body.id),
             size : req.body.size[i]
         };
-        // console.log(size_object)
         mySQL_insert("sizes",size_object);
     }
 
@@ -165,7 +147,6 @@ app.post("/admin/product", admin.fields([{name:'main_image',maxCount:1},{name:'i
             id:parseInt(req.body.id),
             images : req.files.images[i].location
         };
-        // console.log(images_object)
         mySQL_insert("images",images_object);
     }
 
@@ -186,259 +167,90 @@ app.get("/api/v1/products/all",function(req,res){
     let offset_number = 6 * paging;
 
     //優化寫法 改用一次 query 比較看看
-    // pool.query(`SELECT COUNT(id) from products` ,function (err,result) {
+    pool.query(`SELECT COUNT(id) from products` ,function (err,result) {
         
-    //     if (err || result.length === 0) {
-    //         res.send(err);
-    //         return;
-    //     }
-    //     let product_total_number = result[0]['COUNT(id)']
-
-    
-    //     let get_product_id =`select products.*, GROUP_CONCAT(DISTINCT concat_ws(",", color.code, color.name) ORDER BY color.no separator ";") AS colors, GROUP_CONCAT(DISTINCT sizes.size ORDER BY FIELD(sizes.size, "S","M","L","XL")) AS sizes, GROUP_CONCAT(DISTINCT concat_ws(",", variant.color_code  ,variant.size , variant.stock) separator ";") AS variants, GROUP_CONCAT(DISTINCT images.images) AS images from products LEFT JOIN color ON products.id = color.id LEFT JOIN sizes ON products.id = sizes.id LEFT JOIN variant ON products.id = variant.id LEFT JOIN images ON products.id = images.id GROUP BY products.id order by id limit ${limit_number} offset ${offset_number}`;
-    //     pool.query(get_product_id ,function (err,rs) {
-    //         if (err){
-    //             res.send(err);
-    //             return;
-    //         };
-            
-    //         //如果沒資料則顯error
-    //         if (rs.length ==0){
-    //             var error = {
-    //                 "error": "Invalid token."
-    //             };
-    //             res.send(error);
-    //         }
-
-    //         // console.log(rs)
-    //         let product_list = []
-
-    //         for (var i = 0 ; i <rs.length ;i++){
-
-    //             var data ={};
-    //             data.id  = rs[i].id;
-    //             data.title = rs[i].title;
-    //             data.description = rs[i].description;
-    //             data.price = rs[i].price;
-    //             data.texture = rs[i].texture;
-    //             data.wash = rs[i].wash;
-    //             data.place = rs[i].place;
-    //             data.note = rs[i].note;
-    //             data.story = rs[i].story;
-
-    //             let color_array = rs[i].colors.split(";").map(item=>{
-    //                 return {
-    //                 code:item.split(",")[0],
-    //                 name:item.split(",")[1]
-    //             }
-    //             })
-    //             data.colors = color_array;
-                
-    //             let size_array = rs[i].sizes.split(",")
-    //             data.sizes = size_array;
-
-    //             let variant_array = rs[i].variants.split(";").map(item=>{
-    //                 return {
-    //                 color_code:item.split(",")[0],
-    //                 size:item.split(",")[1],
-    //                 stock:Number(item.split(",")[2])
-    //             }
-    //             })
-    //             data.variants = variant_array;
-    //             data.main_image = rs[i].main_image;
-
-    //             let image_array = rs[i].images.split(",")
-    //             data.images = image_array;
-
-    //             product_list.push(data);       
-                
-    //         }
-
-            
-    //         if(product_total_number-limit_number*(paging+1) <= 0){  //確保資料已在最後一頁，就不會顯示page
-
-    //             var page_data ={
-    //                     "data" : product_list,
-    //                 };
-    //                 res.send(page_data);
-    //         }else{
-    //             var page_data ={
-    //                 "data" : product_list,
-    //                 "paging" : paging+1
-    //             };
-    //             res.send(page_data);
-    //         }
-
-    //     });
-    
-    // })
-
-
-    //直覺式的每一個 product 都用迴圈地去 query
-    let get_product_id =`select products.id from products order by id limit ${limit_number} offset ${offset_number}`;
-    pool.query(get_product_id ,function (err,rs) {
-        if (err) throw err;
-        //利用迴圈搜尋特定產品id
-        var product_list=[];
-        var count = 0;
-        var count2 = 0;
-        
-        //如果沒資料則顯error
-        if (rs.length ==0){
-            var error = {
-                "error": "Invalid token."
-            };
-            res.send(error);
+        if (err || result.length === 0) {
+            res.send(err);
+            return;
         }
+        let product_total_number = result[0]['COUNT(id)']
 
-
-        for (var i = 0 ; i <rs.length ;i++){
-            let product_id =rs[i].id;
-             //console.log(product_id);
-            var promise_product = new Promise( function(resolve, reject) { 
-                var sql = `select * from products where products.id = ${product_id}`;
-                pool.query(sql, function (err, results) {
-                    if (err || results.length === 0) {
-                        reject();
-                    }else {
-                        resolve(results);
-                    }
-                });
-                return promise_product;    
-            });
-        
-
-            var promise_product_join_color = new Promise( function(resolve, reject) {
-                var sql = `select distinct color.code, color.name from color where color.id = ${product_id}`;
-                pool.query(sql, function (err, results) {
-                    if (err || results.length === 0) {
-                        reject();
-                    }else {
-                        resolve(results);
-                        //console.log(results);
-                    }
-                });
-                return promise_product_join_color;    
-            });
+    
+        let get_product_id =`select products.*, GROUP_CONCAT(DISTINCT concat_ws(",", color.code, color.name) ORDER BY color.no separator ";") AS colors, GROUP_CONCAT(DISTINCT sizes.size ORDER BY FIELD(sizes.size, "S","M","L","XL")) AS sizes, GROUP_CONCAT(DISTINCT concat_ws(",", variant.color_code  ,variant.size , variant.stock) separator ";") AS variants, GROUP_CONCAT(DISTINCT images.images) AS images from products LEFT JOIN color ON products.id = color.id LEFT JOIN sizes ON products.id = sizes.id LEFT JOIN variant ON products.id = variant.id LEFT JOIN images ON products.id = images.id GROUP BY products.id order by id limit ${limit_number} offset ${offset_number}`;
+        pool.query(get_product_id ,function (err,rs) {
+            if (err){
+                res.send(err);
+                return;
+            };
             
+            //如果沒資料則顯error
+            if (rs.length ==0){
+                var error = {
+                    "error": "Invalid token."
+                };
+                res.send(error);
+            }
 
-            var promise_product_join_sizes = new Promise( function(resolve, reject) {
-                var sql = `select * from sizes where sizes.id = ${product_id}`;
-                pool.query(sql, function (err, results) {
-                    if (err || results.length === 0) {
-                        reject();
-                    }else {
-                        var size_array= [];
-                        for (var j =0 ; j< results.length;j++){
-                            size_array.push(results[j].size);
-                            resolve(size_array);
-                        }
-                    } 
-                });
-                return promise_product_join_sizes;    
-            });
+            let product_list = [];
 
-            var promise_product_join_variant = new Promise( function(resolve, reject) {
-                var sql = `select variant.color_code, variant.size, variant.stock from variant where variant.id = ${product_id}`;
-                pool.query(sql, function (err, results) {
-                    if (err || results.length === 0) {
-                        reject();
-                    }else {
-                        resolve(results);
-                        //console.log(results)
-                    }
-                });
-                return promise_product_join_variant;    
-            });
-
-            var promise_product_join_images = new Promise( function(resolve, reject) {
-                var sql = `select * from images where images.id = ${product_id}`;
-                pool.query(sql, function (err, results) {
-                    if (err || results.length === 0) {
-                        reject();
-                    }else {
-                        var images_array= [];
-                        for (var k =0 ; k< results.length;k++){
-                            images_array.push(results[k].images);
-                            resolve(images_array);
-                        }
-                    }
-                });
-                return promise_product_join_images;    
-            });
-
-            //顯示總資料數
-            var promise_product_sum = new Promise( function(resolve, reject) {
-                var sql = `SELECT COUNT(id) from products`;
-                pool.query(sql, function (err, results) {
-                    if (err || results.length === 0) {
-                        reject();
-                    }else {
-                        resolve(results[0]["COUNT(id)"]);
-                        // console.log(results[0]["COUNT(id)"])
-                    }
-                });
-                return promise_product_sum;    
-            });
-
-            
-            //在這邊組合成規定的形式
-            Promise.all([promise_product, promise_product_join_color, promise_product_join_sizes, promise_product_join_variant,promise_product_join_images,promise_product_sum]).then(function (results) {
+            for (var i = 0 ; i <rs.length ;i++){
 
                 var data ={};
-                data.id  = results[0][0].id;
-                data.title = results[0][0].title;
-                data.description = results[0][0].description;
-                data.price = results[0][0].price;
-                data.texture = results[0][0].texture;
-                data.wash = results[0][0].wash;
-                data.place = results[0][0].place;
-                data.note = results[0][0].note;
-                data.story = results[0][0].story;
-                data.colors = results[1];
-                data.sizes = results[2];
-                data.variants = results[3];
-                data.main_image = results[0][0].main_image;
-                data.images = results[4];
+                data.id  = rs[i].id;
+                data.title = rs[i].title;
+                data.description = rs[i].description;
+                data.price = rs[i].price;
+                data.texture = rs[i].texture;
+                data.wash = rs[i].wash;
+                data.place = rs[i].place;
+                data.note = rs[i].note;
+                data.story = rs[i].story;
 
-                count = count + 1;   //確保上面跑完，計數器+1 避免非同步問題 
+                let color_array = rs[i].colors.split(";").map(item=>{
+                    return {
+                        code:item.split(",")[0],
+                        name:item.split(",")[1]
+                    }
+                });
+                data.colors = color_array;
                 
-                if (count == rs.length){
-                    product_list.push(data);
-                    console.log(product_list[0].id);
-                    //res.send(product_list);
-                    //console.log(results[5]);
-                    //console.log(limit_number);
-                    if(results[5]-limit_number*(paging+1) <= 0){  //確保資料已在最後一頁，就不會顯示page
-                        // console.log(results[5]-offset_number*(paging+1))
-                        // console.log(product_list)
-                        
-                        var page_data ={
-                                "data" : product_list,
-                            };
-                            // console.log(page_data);
-                            res.send(page_data);
-                    }else{
-                        var page_data ={
-                            "data" : product_list,
-                            "paging" : paging+1
-                        };
-                        // console.log(page_data);
-                        res.send(page_data);
+                let size_array = rs[i].sizes.split(",")
+                data.sizes = size_array;
+
+                let variant_array = rs[i].variants.split(";").map(item=>{
+                    return {
+                    color_code:item.split(",")[0],
+                    size:item.split(",")[1],
+                    stock:Number(item.split(",")[2])
                     }
+                });
+                data.variants = variant_array;
+                data.main_image = rs[i].main_image;
 
-                }else{
-                    if(count = count2+1){
-                        product_list.push(data);
-                        count2 = count2+1;
-                    }
-                }
-            });
+                let image_array = rs[i].images.split(",")
+                data.images = image_array;
 
-        }
+                product_list.push(data);       
+                
+            }
 
-        
+            
+            if(product_total_number-limit_number*(paging+1) <= 0){  //確保資料已在最後一頁，就不會顯示page
 
+                var page_data ={
+                        "data" : product_list,
+                    };
+                    res.send(page_data);
+            }else{
+                var page_data ={
+                    "data" : product_list,
+                    "paging" : paging+1
+                };
+                res.send(page_data);
+            }
+
+        });
+    
     });
 
 });
@@ -475,7 +287,6 @@ app.get("/api/v1/products/men",function(req,res){
 
         for (var i = 0 ; i <rs.length ;i++){
             let product_id =rs[i].id;
-             //console.log(product_id);
             var promise_product = new Promise( function(resolve, reject) {
                 var sql = `select * from products where products.id = ${product_id}`;
                 pool.query(sql, function (err, results) {
@@ -496,7 +307,6 @@ app.get("/api/v1/products/men",function(req,res){
                         reject();
                     }else {
                         resolve(results);
-                        //console.log(results);
                     }
                 });
                 return promise_product_join_color;    
@@ -524,9 +334,8 @@ app.get("/api/v1/products/men",function(req,res){
                 pool.query(sql, function (err, results) {
                     if (err || results.length === 0) {
                         reject();
-                    }else {
+                    }else{
                         resolve(results);
-                        //console.log(results);
                     }
                 });
                 return promise_product_join_variant;    
@@ -537,7 +346,7 @@ app.get("/api/v1/products/men",function(req,res){
                 pool.query(sql, function (err, results) {
                     if (err || results.length === 0) {
                         reject();
-                    }else {
+                    }else{
                         var images_array= [];
                         for (var k =0 ; k< results.length;k++){
                             images_array.push(results[k].images);
@@ -556,7 +365,6 @@ app.get("/api/v1/products/men",function(req,res){
                         reject();
                     }else {
                         resolve(results[0]["COUNT(id)"]);
-                        //console.log(results[0]["COUNT(id)"]);
                     }
                 });
                 return promise_product_sum ;    
@@ -586,25 +394,17 @@ app.get("/api/v1/products/men",function(req,res){
                 
                 if (count == rs.length){
                     product_list.push(data);
-                    //console.log(product_list[0].id);
-                    //res.send(product_list);
-                    //console.log(results[5]);
-                    //console.log(limit_number);
                     if(results[5]-limit_number*(paging+1) <= 0){  //確保資料已在最後一頁，就不會顯示page
-                        console.log(results[5]-offset_number*(paging+1));
-                        console.log(product_list);
 
                         var page_data ={
                                 "data" : product_list,
                             };
-                            console.log(page_data);
                             res.send(page_data);
                     }else{
                         var page_data ={
                             "data" : product_list,
                             "paging" : paging+1
                         };
-                        console.log(page_data);
                         res.send(page_data);
                     }
 
@@ -615,13 +415,8 @@ app.get("/api/v1/products/men",function(req,res){
                     }
                 }
             });
-
         }
-
-        
-
     });
-
 });
 
 //output all the databases data when attribue = women
@@ -656,7 +451,6 @@ app.get("/api/v1/products/women",function(req,res){
 
         for (var i = 0 ; i <rs.length ;i++){
             let product_id =rs[i].id;
-             //console.log(product_id);
             var promise_product = new Promise( function(resolve, reject) {
                 var sql = `select * from products where products.id = ${product_id}`;
                 pool.query(sql, function (err, results) {
@@ -677,7 +471,6 @@ app.get("/api/v1/products/women",function(req,res){
                         reject();
                     }else {
                         resolve(results);
-                        //console.log(results)
                     }
                 });
                 return promise_product_join_color;    
@@ -707,7 +500,6 @@ app.get("/api/v1/products/women",function(req,res){
                         reject();
                     }else {
                         resolve(results);
-                        //console.log(results);
                     }
                 });
                 return promise_product_join_variant;    
@@ -737,7 +529,6 @@ app.get("/api/v1/products/women",function(req,res){
                         reject();
                     }else {
                         resolve(results[0]["COUNT(id)"]);
-                        console.log(results[0]["COUNT(id)"]);
                     }
                 });
                 return promise_product_sum;    
@@ -767,25 +558,16 @@ app.get("/api/v1/products/women",function(req,res){
                 
                 if (count == rs.length){
                     product_list.push(data);
-                    console.log(product_list[0].id);
-                    //res.send(product_list);
-                    //console.log(results[5]);
-                    //console.log(limit_number);
                     if(results[5]-limit_number*(paging+1) <= 0){  //確保資料已在最後一頁，就不會顯示page
-                        console.log(results[5]-offset_number*(paging+1));
-                        console.log(product_list);
-
                         var page_data ={
                                 "data" : product_list,
                             }
-                            console.log(page_data);
                             res.send(page_data);
                     }else{
                         var page_data ={
                             "data" : product_list,
                             "paging" : paging+1
                         };
-                        console.log(page_data);
                         res.send(page_data);
                     }
 
@@ -796,13 +578,8 @@ app.get("/api/v1/products/women",function(req,res){
                     }
                 }
             });
-
         }
-
-        
-
     });
-
 });
 
 //output all the databases data when attribue = accessories
@@ -837,7 +614,6 @@ app.get("/api/v1/products/accessories",function(req,res){
 
         for (var i = 0 ; i <rs.length ;i++){
             let product_id =rs[i].id;
-             //console.log(product_id);
             var promise_product = new Promise( function(resolve, reject) {
                 var sql = `select * from products where products.id = ${product_id}`;
                 pool.query(sql, function (err, results) {
@@ -858,7 +634,6 @@ app.get("/api/v1/products/accessories",function(req,res){
                         reject();
                     }else {
                         resolve(results);
-                        //console.log(results);
                     }
                 });
                 return promise_product_join_color;    
@@ -888,7 +663,6 @@ app.get("/api/v1/products/accessories",function(req,res){
                         reject();
                     }else {
                         resolve(results);
-                        //console.log(results);
                     }
                 });
                 return promise_product_join_variant;    
@@ -918,7 +692,6 @@ app.get("/api/v1/products/accessories",function(req,res){
                         reject();
                     }else {
                         resolve(results[0]["COUNT(id)"]);
-                        console.log(results[0]["COUNT(id)"]);
                     }
                 });
                 return promise_product_sum ;    
@@ -948,25 +721,17 @@ app.get("/api/v1/products/accessories",function(req,res){
                 
                 if (count == rs.length){
                     product_list.push(data);
-                    console.log(product_list[0].id);
-                    //res.send(product_list);
-                    //console.log(results[5]);
-                    //console.log(limit_number);
                     if(results[5]-limit_number*(paging+1) <= 0){  //確保資料已在最後一頁，就不會顯示page
-                        console.log(results[5]-offset_number*(paging+1));
-                        console.log(product_list);
 
                         var page_data ={
                                 "data" : product_list,
                             };
-                            console.log(page_data);
                             res.send(page_data);
                     }else{
                         var page_data ={
                             "data" : product_list,
                             "paging" : paging+1
                         };
-                        console.log(page_data);
                         res.send(page_data);
                     }
 
@@ -977,13 +742,8 @@ app.get("/api/v1/products/accessories",function(req,res){
                     }
                 }
             });
-
         }
-
-        
-
     });
-
 });
 
 //output all the databases data when search some conditions
@@ -1000,31 +760,21 @@ app.get("/api/v1/products/search",function(req,res){
     let offset_number = 3 * paging;
 
     let search_keyword;
-    console.log(!("keyword" in req.query));
 
     if (!("keyword" in req.query) ){
         var error = {
             "error": "Invalid token."
         };
-        console.log("error");
-        console.log(req.query.keyword);
         throw new Error(res.send(error));
     }else{
         if(req.query.keyword.length ==0){
             var error = {
                 "error": "Invalid token."
             };
-            console.log("error!!");
-            console.log(req.query.keyword);
             throw new Error(res.json(error));
         }else{
             search_keyword = `"%${req.query.keyword}%"`;
-            //console.log(req.query.keyword.length);
-
         }
-        
-        
-
     }
 
     let get_product_id =`select products.id from products where products.title LIKE ${search_keyword} order by id limit ${limit_number} offset ${offset_number}`
@@ -1046,7 +796,6 @@ app.get("/api/v1/products/search",function(req,res){
 
         for (var i = 0 ; i <rs.length ;i++){
             let product_id =rs[i].id;
-             //console.log(product_id);
             var promise_product = new Promise( function(resolve, reject) {
                 var sql = `select * from products where products.id = ${product_id}`;
                 pool.query(sql, function (err, results) {
@@ -1067,7 +816,6 @@ app.get("/api/v1/products/search",function(req,res){
                         reject();
                     }else {
                         resolve(results);
-                        //console.log(results);
                     }
                 });
                 return promise_product_join_color;    
@@ -1097,7 +845,6 @@ app.get("/api/v1/products/search",function(req,res){
                         reject();
                     }else {
                         resolve(results);
-                        //console.log(results);
                     }
                 });
                 return promise_product_join_variant;    
@@ -1127,7 +874,6 @@ app.get("/api/v1/products/search",function(req,res){
                         reject();
                     }else {
                         resolve(results[0]["COUNT(id)"]);
-                        console.log(results[0]["COUNT(id)"]);
                     }
                 });
                 return promise_product_sum ;    
@@ -1157,13 +903,7 @@ app.get("/api/v1/products/search",function(req,res){
                 
                 if (count == rs.length){
                     product_list.push(data);
-                    console.log(product_list[0].id);
-                    //res.send(product_list);
-                    //console.log(results[5]);
-                    //console.log(limit_number);
                     if(results[5]-limit_number*(paging+1) <= 0){  //確保資料已在最後一頁，就不會顯示page
-                        console.log(results[5]-offset_number*(paging+1));
-                        console.log(product_list);
                         
                         var page_data ={
                                 "data" : product_list,
@@ -1175,7 +915,6 @@ app.get("/api/v1/products/search",function(req,res){
                             "data" : product_list,
                             "paging" : paging+1
                         };
-                        console.log(page_data);
                         res.send(page_data);
                     }
 
@@ -1188,9 +927,6 @@ app.get("/api/v1/products/search",function(req,res){
             });
 
         }
-
-        
-
     });
 
 });
@@ -1199,132 +935,36 @@ app.get("/api/v1/products/search",function(req,res){
 app.get("/api/v1/products/details",function(req,res){
 
     let detail_id;
-    console.log(!("id" in req.query));
 
     if (!("id" in req.query) ){
         var error = {
             "error": "Invalid token."
         };
-        console.log("error");
-        console.log(req.query.keyword) ;
         throw new Error(res.send(error));
     }else{
         if(req.query.id.length ==0){
             var error = {
                 "error": "Invalid token."
             };
-            console.log("error!!");
-            console.log(req.query.id);
             throw new Error(res.send(error));
         }else{
             detail_id = parseInt(`${req.query.id}`);
-            //console.log(req.query.keyword.length);
 
         }
         
     }
     
     //優化 一次 query 的寫法 
-    // myCache.get( `product_id_${parseInt(detail_id)}`, function( err, value ){
-    //     if( !err ){
-    //         console.log(`product_id_${parseInt(detail_id)}的value`);
-    //         console.log(value);
-    //         if(value == undefined){
-            
-
-    //             console.log("網址"+detail_id);
-                
-    //             let get_product_id =`select products.*, GROUP_CONCAT(DISTINCT concat_ws(",", color.code, color.name) ORDER BY color.no separator ";") AS colors, GROUP_CONCAT(DISTINCT sizes.size ORDER BY FIELD(sizes.size, "S","M","L","XL")) AS sizes, GROUP_CONCAT(DISTINCT concat_ws(",", variant.color_code  ,variant.size , variant.stock) separator ";") AS variants, GROUP_CONCAT(DISTINCT images.images) AS images from products LEFT JOIN color ON products.id = color.id LEFT JOIN sizes ON products.id = sizes.id LEFT JOIN variant ON products.id = variant.id LEFT JOIN images ON products.id = images.id where products.id = ${detail_id} GROUP BY products.id `;
-    //             pool.query(get_product_id ,function (err,rs) {
-    //                 if (err){
-    //                     res.send(err);
-    //                     return;
-    //                 };
-                    
-    //                 //如果沒資料則顯error
-    //                 if (rs.length ==0){
-    //                     var error = {
-    //                         "error": "Invalid token."
-    //                     };
-    //                     res.send(error);
-    //                 }
-        
-    //                 // console.log(rs)
-    //                 let product_list = []
-        
-
-        
-    //                     var data ={};
-    //                     data.id  = rs[0].id;
-    //                     data.title = rs[0].title;
-    //                     data.description = rs[0].description;
-    //                     data.price = rs[0].price;
-    //                     data.texture = rs[0].texture;
-    //                     data.wash = rs[0].wash;
-    //                     data.place = rs[0].place;
-    //                     data.note = rs[0].note;
-    //                     data.story = rs[0].story;
-        
-    //                     let color_array = rs[0].colors.split(";").map(item=>{
-    //                         return {
-    //                         code:item.split(",")[0],
-    //                         name:item.split(",")[1]
-    //                     }
-    //                     })
-    //                     data.colors = color_array;
-                        
-    //                     let size_array = rs[0].sizes.split(",")
-    //                     data.sizes = size_array;
-        
-    //                     let variant_array = rs[0].variants.split(";").map(item=>{
-    //                         return {
-    //                         color_code:item.split(",")[0],
-    //                         size:item.split(",")[1],
-    //                         stock:Number(item.split(",")[2])
-    //                     }
-    //                     })
-    //                     data.variants = variant_array;
-    //                     data.main_image = rs[0].main_image;
-        
-    //                     let image_array = rs[0].images.split(",")
-    //                     data.images = image_array;
-        
-    //                     product_list.push(data);
-                        
-    //                     var page_data ={
-    //                         "data" : product_list,
-    //                     };
-    //                     res.send(page_data);
-                        
-                    
-        
-
-        
-    //             });
-    //         }else{
-    //             console.log( `回傳 product${detail_id} cache ` );
-    //             res.send(value);
-    //         }
-    //     }
-    // });
-
-
-
-
-    //原本的寫法
     myCache.get( `product_id_${parseInt(detail_id)}`, function( err, value ){
         if( !err ){
-            console.log(`product_id_${parseInt(detail_id)}的value`);
-            console.log(value);
             if(value == undefined){
-            
-
-                console.log("網址"+detail_id);
-                let get_product_id =`select products.id from products where products.id = ${detail_id} `;
+                let get_product_id =`select products.*, GROUP_CONCAT(DISTINCT concat_ws(",", color.code, color.name) ORDER BY color.no separator ";") AS colors, GROUP_CONCAT(DISTINCT sizes.size ORDER BY FIELD(sizes.size, "S","M","L","XL")) AS sizes, GROUP_CONCAT(DISTINCT concat_ws(",", variant.color_code  ,variant.size , variant.stock) separator ";") AS variants, GROUP_CONCAT(DISTINCT images.images) AS images from products LEFT JOIN color ON products.id = color.id LEFT JOIN sizes ON products.id = sizes.id LEFT JOIN variant ON products.id = variant.id LEFT JOIN images ON products.id = images.id where products.id = ${detail_id} GROUP BY products.id `;
                 pool.query(get_product_id ,function (err,rs) {
-                    if (err) throw err;
+                    if (err){
+                        res.send(err);
+                        return;
+                    };
                     
-                    var product_list=[];
                     //如果沒資料則顯error
                     if (rs.length ==0){
                         var error = {
@@ -1332,132 +972,62 @@ app.get("/api/v1/products/details",function(req,res){
                         };
                         res.send(error);
                     }
-
-                    let product_id =rs[0].id;
-                    //console.log(product_id);
-                    var promise_product = new Promise( function(resolve, reject) {
-                        var sql = `select * from products where products.id = ${product_id}`;
-                        pool.query(sql, function (err, results) {
-                            if (err || results.length === 0) {
-                                reject();
-                            }else {
-                                resolve(results);
-                            }
-                        });
-                        return promise_product;    
-                    });
-                
-
-                    var promise_product_join_color = new Promise( function(resolve, reject) {
-                        var sql = `select distinct color.code, color.name from color where color.id = ${product_id}`;
-                        pool.query(sql, function (err, results) {
-                            if (err || results.length === 0) {
-                                reject();
-                            }else {
-                                resolve(results);
-                                //console.log(results);
-                            }
-                        });
-                        return promise_product_join_color;    
-                    });
-                        
-
-                    var promise_product_join_sizes = new Promise( function(resolve, reject) {
-                        var sql = `select * from sizes where sizes.id = ${product_id}`;
-                        pool.query(sql, function (err, results) {
-                            if (err || results.length === 0) {
-                                reject();
-                            }else {
-                                var size_array= [];
-                                for (var j =0 ; j< results.length;j++){
-                                    size_array.push(results[j].size);
-                                    resolve(size_array);
-                                }
-                            }
-                        });
-                        return promise_product_join_sizes;    
-                    });
-
-                    var promise_product_join_variant = new Promise( function(resolve, reject) {
-                        var sql = `select variant.color_code, variant.size, variant.stock from variant where variant.id = ${product_id}`;
-                        pool.query(sql, function (err, results) {
-                            if (err || results.length === 0) {
-                                reject();
-                            }else {
-                                resolve(results);
-                                //console.log(results);
-                            }
-                        });
-                        return promise_product_join_variant;    
-                    });
-
-                    var promise_product_join_images = new Promise( function(resolve, reject) {
-                        var sql = `select * from images where images.id = ${product_id}`;
-                        pool.query(sql, function (err, results) {
-                            if (err || results.length === 0) {
-                                reject();
-                            }else {
-                                var images_array= [];
-                                for (var k =0 ; k< results.length;k++){
-                                    images_array.push(results[k].images);
-                                    resolve(images_array);
-                                }
-                            }
-                        });
-                        return promise_product_join_images;    
-                    });
-
-                        
-                    //在這邊組合成規定的形式
-                    Promise.all([promise_product, promise_product_join_color, promise_product_join_sizes, promise_product_join_variant,promise_product_join_images]).then(function (results) {
-
-                        var data ={};
-                        data.id  = results[0][0].id;
-                        data.title = results[0][0].title;
-                        data.description = results[0][0].description;
-                        data.price = results[0][0].price;
-                        data.texture = results[0][0].texture;
-                        data.wash = results[0][0].wash;
-                        data.place = results[0][0].place;
-                        data.note = results[0][0].note;
-                        data.story = results[0][0].story;
-                        data.colors = results[1];
-                        data.sizes = results[2];
-                        data.variants = results[3];
-                        data.main_image = results[0][0].main_image;
-                        data.images = results[4];
-                
-                        product_list.push(data);
-                        // console.log(product_list[0].id);
-                        //res.send(product_list);
-                        //console.log(limit_number);
-                        // console.log(product_list);
-                        
-                        var page_data ={
-                                "data" : product_list,
-                        };
-
-                        myCache.set( `product_id_${detail_id}`, page_data, function( err, success ){
-                            if( !err && success ){
-                            console.log( `存入 product${detail_id} cache 成功` );
-                            // true
-                            // ... do something ...
-                            }
-                        });
-
-                        // console.log(page_data)
-                        res.send(page_data);
-
-                    });
-
-
+        
+                    let product_list = []
+        
+                    var data ={};
+                    data.id  = rs[0].id;
+                    data.title = rs[0].title;
+                    data.description = rs[0].description;
+                    data.price = rs[0].price;
+                    data.texture = rs[0].texture;
+                    data.wash = rs[0].wash;
+                    data.place = rs[0].place;
+                    data.note = rs[0].note;
+                    data.story = rs[0].story;
+    
+                    let color_array = rs[0].colors.split(";").map(item=>{
+                        return {
+                            code:item.split(",")[0],
+                            name:item.split(",")[1]
+                        }
+                    })
+                    data.colors = color_array;
+                    
+                    let size_array = rs[0].sizes.split(",")
+                    data.sizes = size_array;
+    
+                    let variant_array = rs[0].variants.split(";").map(item=>{
+                        return {
+                            color_code:item.split(",")[0],
+                            size:item.split(",")[1],
+                            stock:Number(item.split(",")[2])
+                        }
+                    })
+                    data.variants = variant_array;
+                    data.main_image = rs[0].main_image;
+    
+                    let image_array = rs[0].images.split(",")
+                    data.images = image_array;
+    
+                    product_list.push(data);
+                    
+                    var page_data ={
+                        "data" : product_list,
+                    };
+                    res.send(page_data);
+                    
                 });
             }else{
-                console.log( `回傳 product${detail_id} cache ` );
                 res.send(value);
             }
         }
     });
+
+
+
+
+    
 });
 
 //user input the campaign data from campaign.html and send here
@@ -1470,16 +1040,12 @@ app.post("/admin/campaign", admin.fields([{name:'picture',maxCount:20}]),functio
             picture:req.files['picture'][0].location,
             story:req.body.story
         };
-        // console.log(req.files['picture']);
-        // console.log(req.files['picture'][0]);
         pool.query('insert into campaign set ?',campaign_object,function (err,rs) {
             if (err) throw err;
-            console.log('insert campaign table ok');
 
             myCache.del( "campaign_data", function( err, count ){
                 if( !err ){
-                    console.log("刪除 cache"); // 1
-                    // ... do something ...
+                    console.log("刪除 cache"); 
                 }
             });
 
@@ -1491,15 +1057,12 @@ app.post("/admin/campaign", admin.fields([{name:'picture',maxCount:20}]),functio
                 picture:req.files['picture'][i].location,
                 story:req.body.story[i]
             };
-            console.log(campaign_object);
             pool.query('insert into campaign set ?',campaign_object,function (err,rs) {
                 if (err) throw err;
-                console.log('insert campaign table ok');
 
                 myCache.del( "campaign_data", function( err, count ){
                     if( !err ){
-                        console.log("刪除 cache"); // 1
-                        // ... do something ...
+                        console.log("刪除 cache"); 
                     }
                 });
 
@@ -1507,9 +1070,6 @@ app.post("/admin/campaign", admin.fields([{name:'picture',maxCount:20}]),functio
             });
         }    
     }
-
-    
-
     res.redirect('/')
 });
 
@@ -1518,8 +1078,6 @@ app.get("/api/v1/marketing/campaigns",function(req,res){
 
     myCache.get( "campaign_data", function( err, value ){
         if( !err ){
-
-            console.log(value);
             if(value == undefined){
                 //先把全部產品id抓出來
 
@@ -1530,7 +1088,6 @@ app.get("/api/v1/marketing/campaigns",function(req,res){
                     var campaign_list=[];
                     var count = 0;
                     var count2 = 0;
-                    // console.log(rs[0].product_id);
                     //如果沒資料則顯error
                     if (rs.length ==0){
                         var error = {
@@ -1544,7 +1101,6 @@ app.get("/api/v1/marketing/campaigns",function(req,res){
                         
                         
                         let product_id =rs[i].product_id;
-                        // console.log(product_id);
                     
                         
                         var promise_campaign = new Promise( function(resolve, reject) {
@@ -1554,7 +1110,6 @@ app.get("/api/v1/marketing/campaigns",function(req,res){
                                     reject();
                                 }else {
                                     resolve(results);
-                                    // console.log(results);
                                 }
                             });
                             return promise_campaign;    
@@ -1580,14 +1135,10 @@ app.get("/api/v1/marketing/campaigns",function(req,res){
                                 myCache.set( "campaign_data", total_data, function( err, success ){
                                     if( !err && success ){
                                         console.log("cache 設置成功"+ success );
-                                        // true
-                                        // ... do something ...
+
                                     }
                                 });
 
-
-
-                                // console.log(total_data)
                                 res.send(total_data);
                                 
 
@@ -1601,21 +1152,13 @@ app.get("/api/v1/marketing/campaigns",function(req,res){
 
                     }
 
-                    
-
                 });
             
             }else{
-                console.log( "send cache value" );
                 res.send(value);
             }
         }
     });
-
-
-
- 
-
 });
 
 //user input the user data from sigh_up.html and send here
@@ -1625,30 +1168,26 @@ app.post("/user/signup",function(req,res){
         var error = {
             "error": "Invalid request body."
         };
-        console.log(error);
+        res.send(error); 
     }else{
     
         //input insert to database test table user 
         if (req.body.name.length ==0 || req.body.email.length ==0 || req.body.password.length ==0){
-            console.log("fail");
-            //res.send("name or email are not empty");
+            res.send("name or email are not empty");
         }else{
             
             //除了查詢 email 有無相同外，因為臉書註冊者也有可能使用相同信箱，所以要增加 native 的判斷
             pool.query(`select email from user where email = "${req.body.email}" and provider = "native" `,function (err,rs) {
                 if (err) throw err;
-                //console.log(rs);
                 
                 if (rs.length >=1){
-                    console.log('duplicate');
-                    //res.send("email duplicate");             
+                    res.send("email duplicate");             
                     
                 }else{
                     
                     //密碼加密
                     const hash_password = crypto.createHash('sha256');
                     hash_password.update(req.body.password);
-                    console.log(req.body.password);
                     
                     
                     const user_object={
@@ -1659,11 +1198,9 @@ app.post("/user/signup",function(req,res){
                         picture:"user_default_image.jpg",
                     };
                     
-                    console.log(user_object);
                 
                     pool.query('insert into user set ?',user_object,function (err,rs) {
                         if (err) throw err;
-                        console.log('insert user table ok');
                     });
                     
                 }
@@ -1675,9 +1212,7 @@ app.post("/user/signup",function(req,res){
         // create access token
         const hash_time = crypto.createHash('sha256');
         hash_time.update(String(Date.now()));
-        //console.log(Date.now());
         var access_token = crypto.randomBytes(48).toString('hex')+hash_time.digest('hex');
-        console.log(access_token);
         const user_token_object={
             access_token:access_token,
             access_expired:Date.now()+ 7.2e+6,
@@ -1688,15 +1223,12 @@ app.post("/user/signup",function(req,res){
         //input insert to database test table user_token
         pool.query('insert into user_token set ?',user_token_object,function (err,rs) {
             if (err) throw err;
-            console.log('insert user_token table ok');
         
 
             //output the user and user_token ，包在 insert 裡面確保不會不同步，會有同時多位註冊者的問題，所以此方式最保險
-            console.log(req.body.email);
             var sql =`select user.id, user.provider, user.name, user.email, user.picture, user_token.access_token,user_token.access_expired from user , user_token WHERE user.email ='${req.body.email}' and user_token.email = '${req.body.email}' `;
             pool.query(sql, function (err, results) {
                 if (err) throw err; 
-                console.log(results); 
                 var user = {};            //usr_objection
                 user.id = results[0].id;
                 user.provider = results[0].provider;
@@ -1712,8 +1244,6 @@ app.post("/user/signup",function(req,res){
                 var sign_up_object = {};
                 sign_up_object.data =  dataobject;
 
-                console.log(sign_up_object);
-
                 res.send(sign_up_object);
 
                 
@@ -1727,70 +1257,40 @@ app.post("/user/signup",function(req,res){
 //user input the user data from sigh_in.html and send here
 app.post("/user/signin",function(req,res){
 
-    
-    console.log(req.body.provider);
-    console.log(req.body);
-    console.log(req.header('Content-Type'));
-    console.log("準備開始");
-
-
-
     if(req.header('Content-Type') != "application/json"){
         var error = {
             "error": "Invalid request body."
         };
         console.log(error);
-        console.log("header 格式不對");
     }else{
-        console.log("header 格式對了，進入下一層");
-        
         if(req.body.provider == "facebook"){
-            console.log("臉書");
             var user_fb_token =req.body.access_token;
             var fb =`https://graph.facebook.com/v3.3/me?fields=email,name,picture.width(400).height(500)&access_token=${user_fb_token}`;
             
-            // var fb = `https://graph.facebook.com/v3.3/me?access_token=${user_fb_token}&fields=name,email,picture%7Burl%7D&method=get&pretty=0&sdk=joey&suppress_http_code=1`;
             request({url: fb}, function (error, response, body) {
                 body = JSON.parse(body);
- 
-                console.log(body);
-                console.log(body.name);
-                console.log(body.email);
-                console.log(body.picture.data.url);
-
                 //臉書註冊者，先判斷信箱有無在資料庫裡，若有就只更新 token 跟時間，若無就插入到資料庫裡
                 pool.query(`select email from user where email = "${body.email}" and provider = "facebook" `,function (err,rs) {
                     if (err) throw err;
-                    //console.log(rs);
-                    console.log(body);
-                    console.log(body.name);
-                    console.log(body.email);
-                    console.log(body.picture.data.url) ;
                     if (rs.length >=1){
                         
                         // create new access token
                         const hash_fb_time = crypto.createHash('sha256');
                         hash_fb_time.update(String(Date.now()));
-                        //console.log(Date.now());
                         var new_fb_access_token = crypto.randomBytes(48).toString('hex')+hash_fb_time.digest('hex');
-                        console.log(new_fb_access_token);
                         const fb_access_expired = Date.now()+ 7.2e+6;
                         
-
 
                         //input insert to database test table user_token
                         pool.query(`UPDATE user_token SET access_token ="${new_fb_access_token}", access_expired ="${fb_access_expired}" WHERE email = "${body.email}"`,function (err,rs) {
                             if (err) throw err;
-                            console.log('update user_token table ok');
                             
                             
                             //output the user and user_token ，包在 insert 裡面確保不會不同步
-                                console.log(body.email);
                                 var sql =`select user.id, user.provider, user.name, user.email, user.picture, user_token.access_token,user_token.access_expired from user , user_token WHERE user.email ='${body.email}' and user_token.email = '${body.email}' `;
                                 pool.query(sql, function (err, results) {
                                     if (err) throw err; 
                                     
-                                    console.log(results);
                                     var user = {};            //usr_objection
                                     user.id = results[0].id;
                                     user.provider = results[0].provider;
@@ -1806,7 +1306,6 @@ app.post("/user/signin",function(req,res){
                                     var sign_up_object = {};
                                     sign_up_object.data =  dataobject;
 
-                                    console.log(sign_up_object);
                                     res.send(sign_up_object);
 
                         
@@ -1825,40 +1324,30 @@ app.post("/user/signin",function(req,res){
                             password:"0",
                             picture:body.picture.data.url,
                         };
-                        
-                        console.log(user_fb_object);
                     
                         pool.query('insert into user set ?',user_fb_object,function (err,rs) {
                             if (err) throw err;
-                            console.log('fb user insert user table ok');
                         })
 
-                        // create access token
                         const hash_fb_time = crypto.createHash('sha256');
                         hash_fb_time.update(String(Date.now()));
-                        //console.log(Date.now());
                         var fb_access_token = crypto.randomBytes(48).toString('hex')+hash_fb_time.digest('hex');
-                        console.log(fb_access_token);
                         const user_fb_token_object={
                             access_token:fb_access_token,
                             access_expired:Date.now()+ 7.2e+6,
                             email:body.email,
                         };
 
-                        console.log(user_fb_token_object);
 
                         //input insert to database test table user_token
                         pool.query('insert into user_token set ?',user_fb_token_object,function (err,rs) {
                             if (err) throw err;
-                            console.log('fb user insert user_token table ok');
-                        
 
                             //output the user and user_token ，包在 insert 裡面確保不會不同步，會有同時多位註冊者的問題，所以此方式最保險
                             var sql =`select user.id, user.provider, user.name, user.email, user.picture, user_token.access_token,user_token.access_expired from user , user_token WHERE user.email ='${body.email}' and user_token.email = '${body.email}' `;
                             pool.query(sql, function (err, results) {
                                 if (err) throw err; 
                                 
-                                console.log(results);
                                 var user = {};            //usr_objection
                                 user.id = results[0].id;
                                 user.provider = results[0].provider;
@@ -1874,85 +1363,63 @@ app.post("/user/signin",function(req,res){
                                 var sign_up_object = {};
                                 sign_up_object.data =  dataobject;
 
-                                console.log(sign_up_object);
-
                                 res.send(sign_up_object);
 
                                 
                             });
 
                         });
-
-
-
                     }
                 });
-
-                                
             });
-
         }else{ 
             //密碼加密後才能查詢資料庫
             const hash_password = crypto.createHash('sha256');
             hash_password.update(req.body.password);
             const crypto_passord = hash_password.digest('hex');
-            console.log("使用者密碼"+req.body.password);
-                
                 
             
             pool.query(`select user.email, user.password from user where user.email = "${req.body.email}" and user.password = "${crypto_passord}"` ,function (err,rs) {
                 if (err) throw err;
-                //console.log(rs);
                 
                 if (rs.length == 0){
-                    console.log('no data!!!');
-                    console.log(req.body.email);
-                    console.log(crypto_passord);
                     res.send("error") ;
-
-                    
                 }else{
 
                     // create new access token
                     const hash_time = crypto.createHash('sha256');
                     hash_time.update(String(Date.now()));
-                    //console.log(Date.now());
                     var new_access_token = crypto.randomBytes(48).toString('hex')+hash_time.digest('hex');
-                    console.log(new_access_token);
                     const access_expired = Date.now()+ 7.2e+6;
                     
                     //input insert to database test table user_token
                     pool.query(`UPDATE user_token SET access_token ="${new_access_token}", access_expired ="${access_expired}" WHERE email = "${req.body.email}"`,function (err,rs) {
                         if (err) throw err;
-                        console.log('update user_token table ok');
 
-                            //output the user and user_token ，包在 insert 裡面確保不會不同步
-                            console.log(req.body.email);
-                            var sql =`select user.id, user.provider, user.name, user.email, user.picture, user_token.access_token,user_token.access_expired from user , user_token WHERE user.email ='${req.body.email}' and user_token.email = '${req.body.email}' `;
-                            pool.query(sql, function (err, results) {
-                                if (err) throw err; 
-                                
-                                console.log(results);
-                                var user = {};     //usr_objection
-                                user.id = results[0].id;
-                                user.provider = results[0].provider;
-                                user.name = results[0].name;
-                                user.eamil = results[0].email;
-                                user.picture = results[0].picture;
+                        //output the user and user_token ，包在 insert 裡面確保不會不同步
+                        var sql =`select user.id, user.provider, user.name, user.email, user.picture, user_token.access_token,user_token.access_expired from user , user_token WHERE user.email ='${req.body.email}' and user_token.email = '${req.body.email}' `;
+                        pool.query(sql, function (err, results) {
+                            if (err) throw err; 
+                            
+                            var user = {};     //usr_objection
+                            user.id = results[0].id;
+                            user.provider = results[0].provider;
+                            user.name = results[0].name;
+                            user.eamil = results[0].email;
+                            user.picture = results[0].picture;
 
-                                var dataobject = {};
-                                dataobject.access_token = results[0].access_token;
-                                dataobject.access_expired = results[0].access_expired;
-                                dataobject.user = user;
-                    
-                                var sign_up_object = {};
-                                sign_up_object.data =  dataobject;
+                            var dataobject = {};
+                            dataobject.access_token = results[0].access_token;
+                            dataobject.access_expired = results[0].access_expired;
+                            dataobject.user = user;
+                
+                            var sign_up_object = {};
+                            sign_up_object.data =  dataobject;
 
-                                console.log(sign_up_object);
-                                res.send(sign_up_object);
+                            res.send(sign_up_object);
 
-                    
-                            });
+                
+                        });
             
 
                     })
@@ -1962,7 +1429,6 @@ app.post("/user/signin",function(req,res){
             });
         }
 
-
     }
 
 });
@@ -1971,12 +1437,8 @@ app.post("/user/signin",function(req,res){
 app.get("/user/profile",function(req,res){
 
 
-    console.log(req.header("authorization"));
-    console.log(req.headers.authorization);
-
     var user_Bearer_token = req.headers.authorization;
     user_Bearer_token = user_Bearer_token.split(" ");
-    console.log(user_Bearer_token);
 
     if(user_Bearer_token[0] != "Bearer"  ){
         console.log("not a Bearer token");
@@ -1984,42 +1446,32 @@ app.get("/user/profile",function(req,res){
         //output the user and user_token 
         var sql = `select user_token.email from user_token  WHERE user_token.access_token =  '${user_Bearer_token[1]}'`;
         pool.query(sql, function (err, results) {
-        if (err) throw err; 
-        
-        if(results.length == 0){
-            console.log("not existing");
-            res.send("error");
-        }else{
-            console.log(results);
-            console.log(results[0].email);
-            var mysql =`select user.id, user.provider, user.name, user.email, user.picture from user join user_token  on user_token.id =  user.id  WHERE user_token.access_token =  '${user_Bearer_token[1]}'`;
-            pool.query(mysql, function (err, result) {
-                if (err) throw err; 
-                
-                console.log(result);
-                var user = {};            //usr_objection
-                user.id = result[0].id;
-                user.provider = result[0].provider;
-                user.name = result[0].name;
-                user.email = result[0].email;
-                user.picture = result[0].picture;
-                
-                var profile_object = {};
-                profile_object.data =  user;
+            if (err) throw err; 
             
-                console.log(profile_object);
-            
-                res.send(profile_object);
-            
-            })
-            
-            
-
-        }
-        
-
-
+            if(results.length == 0){
+                res.send("error");
+            }else{
+                var mysql =`select user.id, user.provider, user.name, user.email, user.picture from user join user_token  on user_token.id =  user.id  WHERE user_token.access_token =  '${user_Bearer_token[1]}'`;
+                pool.query(mysql, function (err, result) {
+                    if (err) throw err; 
                     
+                    var user = {};            //usr_objection
+                    user.id = result[0].id;
+                    user.provider = result[0].provider;
+                    user.name = result[0].name;
+                    user.email = result[0].email;
+                    user.picture = result[0].picture;
+                    
+                    var profile_object = {};
+                    profile_object.data =  user;
+                
+                    res.send(profile_object);
+                
+                })
+                
+                
+            }
+        
         });
     }
 
@@ -2030,15 +1482,6 @@ app.get("/user/profile",function(req,res){
 
 //user input the user data from sigh_in.html and send here
 app.post("/order/checkout",function(req,res){
-
-    
-    // console.log(req.header("authorization"));
-    //console.log(req.headers.authorization);
-    // console.log(req.body);
-    // console.log(req.body.prime);
-    // console.log(req.body.order.list);
-    //console.log(req.body.prime);
-    //console.log(user_Bearer_token[1]);
 
     if(req.header('Content-Type') != "application/json"){
         var error = {
@@ -2057,7 +1500,6 @@ app.post("/order/checkout",function(req,res){
     
     
         if(user_Bearer_token[0] != "Bearer"  ){
-            console.log("not a Bearer token");
             return res.send("error");
             
         }else{
@@ -2068,8 +1510,6 @@ app.post("/order/checkout",function(req,res){
 
 
     var order_number = Date.now();
-    //console.log(order_number);
-    
     
     var user_order_object={
         user_id: "",
@@ -2087,9 +1527,6 @@ app.post("/order/checkout",function(req,res){
         address: req.body.order.recipient.address,
         time: req.body.order.recipient.time
     };
-
-    //console.log(user_order_object);
-
 
     const post_data = {
         "prime": req.body.prime,
@@ -2123,7 +1560,6 @@ app.post("/order/checkout",function(req,res){
             if (err1) throw err1;
             if (result1.length>0){
                 if(result1[0].access_expired-order_number<0){ 
-                    console.log("token expired");
                     return res.redirect('/admin/sign_in.html');
                 }else{
                     user_order_object.user_id = result1[0].id;
@@ -2132,116 +1568,94 @@ app.post("/order/checkout",function(req,res){
                 user_order_object.user_id = 0;
             }
             
-            //console.log(user_order_object)
             pool.query('insert into user_order set ?',user_order_object,function (err2,result2) {
                 if (err2) throw err2;
-                console.log('insert user_order table ok');
                 next(err2, result2);
             });
             
         });
     },
-        function(result2, next){
+    function(result2, next){
+        let user_order_list =[];
 
-            // console.log(req.body.order.list);
-            // console.log(req.body.order.list[0].id);
-            // console.log(req.body.order.list[0].color.code);
-            // console.log(req.body.order.list.length);
-            let user_order_list =[];
-
-            for(let i = 0; i <req.body.order.list.length; i++){
-                let user_order_list_array =
-                    [order_number, req.body.order.list[i].id, req.body.order.list[i].name, parseInt(req.body.order.list[i].price), req.body.order.list[i].color.code, req.body.order.list[i].color.name, req.body.order.list[i].size, parseInt(req.body.order.list[i].qty)];
-                    user_order_list.push(user_order_list_array);
-                }
-            console.log(user_order_list);
-            
-            pool.query('insert into user_order_list (order_number, id, name, price, color_code, color_name, size, qty) values ?',[user_order_list],function (err3,result3) {
+        for(let i = 0; i <req.body.order.list.length; i++){
+            let user_order_list_array =
+                [order_number, req.body.order.list[i].id, req.body.order.list[i].name, parseInt(req.body.order.list[i].price), req.body.order.list[i].color.code, req.body.order.list[i].color.name, req.body.order.list[i].size, parseInt(req.body.order.list[i].qty)];
+                user_order_list.push(user_order_list_array);
+            }
+        
+        pool.query('insert into user_order_list (order_number, id, name, price, color_code, color_name, size, qty) values ?',[user_order_list],function (err3,result3) {
             if (err3) throw err3;
-            console.log('insert user_order_list table ok');
             next(err3, result3);
                 
-            })  
-            
-            
-        }],
-        function(result2,result3, next){
-            request(post_options, function (err4, response, body) {
-                // console.log(body)
-                console.log(body.status);
-                console.log(body.card_info);
+        })  
+        
+        
+    }],
+    function(result2,result3, next){
+        request(post_options, function (err4, response, body) {
 
-                if(body.status !==0){
-                    console.log(body);
-                    let user_order_statment_object ={
-                        order_number: order_number,
-                        prime: req.body.prime,
-                        status: parseInt(body.status),
-                        msg: body.msg
-                    };
-                    pool.query('insert into user_order_statment set ?',user_order_statment_object,function (err5,result4) {
-                        if (err5) throw err5;
-                        console.log('insert user_order_statment table ok');
+            if(body.status !==0){
+                let user_order_statment_object ={
+                    order_number: order_number,
+                    prime: req.body.prime,
+                    status: parseInt(body.status),
+                    msg: body.msg
+                };
+                pool.query('insert into user_order_statment set ?',user_order_statment_object,function (err5,result4) {
+                    if (err5) throw err5;
+                    pool.query(`UPDATE user_order SET payment_statement ="paid"  WHERE order_number = "${order_number}"`,function (err,result) {
+                        if (err) throw err;
+                        res.send("error");
+                    });
+                    
+                });
+            }else{                
+                let user_order_statment_object ={
+                    order_number: order_number,
+                    prime: req.body.prime,
+                    status: parseInt(body.status),
+                    msg: body.msg,
+                    rec_trade_id: body.rec_trade_id,
+                    bank_transaction_id: body.bank_transaction_id,
+                    auth_code: body.auth_code,
+                    amount : parseInt(body.amount),
+                    card_info: JSON.stringify(body.card_info),
+                    acquire: body.acquire,
+                    transaction_time_millis: parseInt(body.transaction_time_millis),
+                    bank_transaction_time: JSON.stringify(body.bank_transaction_time),
+                    bank_result_code: body.bank_result_code,
+                    bank_result_msg: body.bank_result_msg,
+                    card_identifier: body.card_identifier
+
+                };
+                pool.query('insert into user_order_statment set ?',user_order_statment_object,function (err5,result4) {
+                    if (err5){
+                        var final_data ={
+                            data: {
+                                number: order_number 
+                            }
+                        };
+                        res.send(final_data);
+                    }else{
                         pool.query(`UPDATE user_order SET payment_statement ="paid"  WHERE order_number = "${order_number}"`,function (err,result) {
                             if (err) throw err;
-                            console.log('update user_order table ok');
-                            console.log("error");
-                            res.send("error");
-                        });
-                        
-                    });
-                }else{                
-                    let user_order_statment_object ={
-                        order_number: order_number,
-                        prime: req.body.prime,
-                        status: parseInt(body.status),
-                        msg: body.msg,
-                        rec_trade_id: body.rec_trade_id,
-                        bank_transaction_id: body.bank_transaction_id,
-                        auth_code: body.auth_code,
-                        amount : parseInt(body.amount),
-                        card_info: JSON.stringify(body.card_info),
-                        acquire: body.acquire,
-                        transaction_time_millis: parseInt(body.transaction_time_millis),
-                        bank_transaction_time: JSON.stringify(body.bank_transaction_time),
-                        bank_result_code: body.bank_result_code,
-                        bank_result_msg: body.bank_result_msg,
-                        card_identifier: body.card_identifier
-
-                    };
-                    pool.query('insert into user_order_statment set ?',user_order_statment_object,function (err5,result4) {
-                        if (err5){
-                            console.log("err5");
                             var final_data ={
                                 data: {
                                     number: order_number 
                                 }
                             };
                             res.send(final_data);
-                        }else{
-                            console.log('insert user_order_statment table ok');
-                            pool.query(`UPDATE user_order SET payment_statement ="paid"  WHERE order_number = "${order_number}"`,function (err,result) {
-                                if (err) throw err;
-                                console.log('update user_order table ok');
-                                var final_data ={
-                                    data: {
-                                        number: order_number 
-                                    }
-                                };
-                                res.send(final_data);
-                            });
-                        }
+                        });
+                    }
 
-                        
-                    });
-                
-                }
-            });
-
+                    
+                });
             
+            }
         });
-
-
+        
+    });
 
 });
 

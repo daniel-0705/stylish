@@ -23,10 +23,8 @@
                 </ul>
             </nav>
             <div class = "nav_item_bar">
-                <!-- <form action="/?attribute=search"> -->
-                    <input id = "search" style="font-size:20px">
-                    <button  class="search" onclick="search_product()" type ="submit"></button>
-                <!-- </form> -->
+                <input id = "search" style="font-size:20px">
+                <button  class="search" onclick="search_product()" type ="submit"></button>
                 <img src="image_pool/cart.png">
                 <a><img src="image_pool/member.png" onclick="signin_or_profile()"></a>
     
@@ -101,8 +99,6 @@
     }
     function search_product(){
         let word = document.getElementById("search").value;
-        console.log(document.getElementById("search").value);
-        console.log( `search?keyword=${word}`);
         window.location.assign(`/?attribute=search?keyword=${word}`);
     }
 
@@ -111,9 +107,6 @@
 
     function set_header() {
     
-    
-        console.log(document.getElementById("email").value);
-
         if(document.getElementById("name").value == ""){
             alert("! Enter Your Email");
         }else if(document.getElementById("email").value == ""){
@@ -122,9 +115,7 @@
             alert("! Enter Your Password");
         }else{
             var xhr = new XMLHttpRequest();
-            //使用HTTP POST请求与服务器交互数据
             xhr.open("POST", "/user/signup");
-            //设置发送数据的请求格式
             xhr.setRequestHeader('Content-Type', 'application/json');
             
             xhr.send(JSON.stringify({
@@ -136,23 +127,16 @@
 
             xhr.onreadystatechange=function() {
                 if (this.readyState == 4 && this.status == 200) {
-                console.log(xhr.response);
                     
-                let user_number = JSON.parse(xhr.response);
-                console.log(user_number);
-                localStorage.setItem("access_token",user_number.data.access_token);
-                localStorage.setItem("access_expired",user_number.data.access_expired);
-                window.location.href="/";
-                    
+                    let user_number = JSON.parse(xhr.response);
+                    localStorage.setItem("access_token",user_number.data.access_token);
+                    localStorage.setItem("access_expired",user_number.data.access_expired);
+                    window.location.href="/";
+                        
                     
                 }
             }
         }
-        
-
-
-
-
     }
 
 </script>

@@ -99,13 +99,10 @@
 
 <script>
 
-    let number = document.getElementsByClassName("number")[0]
-    number.innerHTML = localStorage.getItem("order_number")
+    let number = document.getElementsByClassName("number")[0];
+    number.innerHTML = localStorage.getItem("order_number");
 
-    console.log(number)
-    console.log(localStorage.getItem("order_number"))
-
-    localStorage.removeItem("order_number")
+    localStorage.removeItem("order_number");
 
 
 

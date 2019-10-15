@@ -21,10 +21,9 @@
                 </ul>
             </nav>
             <div class = "nav_item_bar">
-                <!-- <form action="/?attribute=search"> -->
-                    <input id = "search" style="font-size:20px">
-                    <button  onclick="search_product()" type ="submit"></button>
-                <!-- </form> -->
+              
+                <input id = "search" style="font-size:20px">
+                <button  onclick="search_product()" type ="submit"></button>
                 <img src="image_pool/cart.png">
                 <a><img src="image_pool/member.png" onclick="signin_or_profile()"></a>
 
@@ -78,18 +77,14 @@
         
         function search_product(){
             let word = document.getElementById("search").value
-            console.log(document.getElementById("search").value)
-            console.log( `search?keyword=${word}`)
             window.location.assign(`/?attribute=search?keyword=${word}`)
         }
         
         
         let web_url = document.location.href;
-        console.log(web_url);
         let url = new URL(web_url);
         let params = new URLSearchParams(url.search);
         let attribute_type = params.get("attribute");
-        console.log(attribute_type)  ;
 
         if(attribute_type == null) {
             attribute_type = "all";
@@ -103,12 +98,6 @@
         xhr.onreadystatechange=function() {
             if (this.readyState == 4 && this.status == 200) {
                 let product_data = JSON.parse(xhr.responseText);
-                // console.log(product_data);
-                // console.log(product_data.data.length);
-                // console.log(product_data.data[0].id);
-                // console.log(product_data.data[0].colors);
-                // console.log(product_data.data[0].colors.length);
-                // console.log(product_data.data[0].colors[0].code);
                 for (let i = 0 ; i <product_data.data.length ; i++){
                     //製作每一個 product 的 div
                     let new_div_product = document.createElement("div");
@@ -165,9 +154,6 @@
                     product.appendChild(new_product_price);
 
                 }
-                    
-
-                    
 
             }
 
@@ -184,25 +170,12 @@
     xhrt.onreadystatechange=function() {
         if (this.readyState == 4 && this.status == 200) {
             let campaign_data = JSON.parse(xhrt.responseText);
-            console.log(campaign_data);
-            console.log(campaign_data.data.length);
-            console.log(campaign_data.data[0].picture);
-            console.log(campaign_data.data[0].story);
 
-            // for (let i = 0 ; i <campaign_data.data.length; i++){
-                let campaign_products = document.getElementsByClassName("campaign_products")[0];
-                console.log(campaign_products);
-                campaign_products.style.backgroundImage =`url('${campaign_data.data[0].picture}')`;
+            let campaign_products = document.getElementsByClassName("campaign_products")[0];
+            campaign_products.style.backgroundImage =`url('${campaign_data.data[0].picture}')`;
 
-                let campaign_products_story = document.getElementsByClassName("campaign_products_story")[0];
-                console.log(campaign_products);
-                campaign_products_story.innerText = campaign_data.data[0].story;      
-                
-            // }
-
-            console.log(document.getElementsByClassName("campaign_products"));
-
-
+            let campaign_products_story = document.getElementsByClassName("campaign_products_story")[0];
+            campaign_products_story.innerText = campaign_data.data[0].story;      
 
         }
 
@@ -210,8 +183,6 @@
      
     xhrt.send();
 
-    console.log(localStorage.getItem("access_token"));
-    console.log(localStorage.getItem("access_expired"));
    
     function signin_or_profile(){
         if(localStorage.getItem("access_token") == null){
